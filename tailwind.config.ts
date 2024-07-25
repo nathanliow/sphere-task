@@ -11,9 +11,13 @@ const config: Config = {
       'gradient-start-blue': '#3A76FF',
       'gradient-end-blue': '#27D6FF',
       'blue': '#2C61F9',
+      'dark-blue': '#0B3FD9',
       'black': '#000000',
       'gray': '#D1D7E3',
+      'dark-gray': '#98A2B3',
       'white': '#FFFFFF',
+      'hover-white': '#F4F4F4',
+      'red': '#F85858',
     },
     extend: {
       backgroundImage: {
