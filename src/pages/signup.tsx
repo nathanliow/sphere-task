@@ -5,13 +5,15 @@ import Sphere from "../../public/sphere.svg";
 import Google from "../../public/Google.svg";
 import "../app/globals.css";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, createUser } from "../firebase";
+import { useRouter } from "next/router";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
+    const router = useRouter();
 
     const handleSignUp = async (e: any) => {
       e.preventDefault();
@@ -28,8 +30,12 @@ export default function Login() {
 
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+
+        await createUser(email);
+
+        router.push("/");
       } catch (error: any) {
-        setError(error.message);
+        setError("Error signing up");
       }
     };
 

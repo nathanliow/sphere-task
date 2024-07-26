@@ -6,6 +6,7 @@ import Google from "../../public/Google.svg";
 import "../app/globals.css";
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../firebase";
+import { useRouter } from "next/router";
 
 const provider = new GoogleAuthProvider();
 
@@ -13,14 +14,17 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const router = useRouter();
 
     const handleSignInEmailPassword = async (e: any) => {
       e.preventDefault();
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+        
+        router.push("/");
       } catch (error: any) {
-        setError(error.message);
+        setError("Invalid email or password");
         return;
       }
     };
