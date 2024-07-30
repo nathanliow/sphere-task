@@ -512,7 +512,7 @@ export const terms = `
       informations such as our proceeds from the Platform to the Internal
       Revenue Service to the extent and manner required by applicable law. 
     </p>
-    <p class="my-6"><strong>7 No Warranties and Limited Liability</strong></p>
+    <p class="my-6"><strong>7. No Warranties and Limited Liability</strong></p>
     <p class="my-6 ml-4"><strong>7.1. No Warranties</strong></p>
     <p class="my-6 ml-8">
       SPHERE HEREBY DISCLAIMS ALL WARRANTIES OF ANY KIND

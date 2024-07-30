@@ -6,11 +6,25 @@ import "../app/globals.css";
 import { getAuth } from 'firebase/auth';
 import { getAcceptedTos, updateTos } from '@/firebase';
 import { useRouter } from 'next/router';
+import { launchWebSdk } from '@/sumsubSdk';
 
 export default function Home() {
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    fetch('/api/getAccessToken')
+        .then(response => response.json())
+        .then(data => setAccessToken(data.token));
+  }, []);
+
+  useEffect(() => {
+    if (accessToken) {
+        launchWebSdk(accessToken);
+    }
+  }, [accessToken]);
 
   useEffect(() => {
     const checkAcceptedTos = async () => {
@@ -22,7 +36,7 @@ export default function Home() {
           setIsModalOpen(true);
         }
       } else {
-        router.push("/login");
+        // router.push("/login");
       }
       setLoading(false);
     };
@@ -49,6 +63,10 @@ export default function Home() {
         onClose={handleCloseModal}
         onAccept={handleAcceptTerms}
       />
+      <div>
+        {/* put progress bars */}
+      </div>
+      <div className="w-3/5" id="sumsub-websdk-container"></div>
     </main>
   );
 }
