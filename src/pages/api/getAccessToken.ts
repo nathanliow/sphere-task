@@ -9,11 +9,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const path = `/resources/accessTokens?userId=${encodeURIComponent(userId)}&levelName=${encodeURIComponent(levelName)}&ttlInSecs=600`;
     const secretKey = process.env.SUMSUB_SECRET_KEY || '';
 
-    // Generate the signature
     const stringToSign = ts + method + path;
     const signature = crypto.createHmac('sha256', secretKey).update(stringToSign).digest('hex');
 
-    // Make the request to Sumsub API
     const response = await fetch(`https://api.sumsub.com${path}`, {
         method: method,
         headers: {

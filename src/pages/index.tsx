@@ -15,9 +15,27 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('/api/getAccessToken')
-        .then(response => response.json())
-        .then(data => setAccessToken(data.token));
+    const fetchAccessToken = async () => {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (user) {
+        const response = await fetch('/api/getAccessToken', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: user?.email }), 
+      });
+
+        const data = await response.json();
+        setAccessToken(data.token);
+      } else {
+        router.push("/login");
+      }
+    };
+
+    fetchAccessToken();
   }, []);
 
   useEffect(() => {
@@ -30,14 +48,15 @@ export default function Home() {
     const checkAcceptedTos = async () => {
       const auth = getAuth();
       const user = auth.currentUser;
-      if (user) {
-        const acceptedTos = await getAcceptedTos(user.uid);
+      if (user && user.email) {
+        const acceptedTos = await getAcceptedTos(user.email);
         if (!acceptedTos) {
           setIsModalOpen(true);
+        } else {
+          setIsModalOpen(false);
         }
-      } else {
-        // router.push("/login");
       }
+
       setLoading(false);
     };
 
@@ -49,8 +68,8 @@ export default function Home() {
   const handleAcceptTerms = async () => {
     const auth = getAuth();
     const user = auth.currentUser;
-    if (user) {
-      await updateTos(user.uid);
+    if (user && user.email) {
+      await updateTos(user.email);
       setIsModalOpen(false);
     }
   };

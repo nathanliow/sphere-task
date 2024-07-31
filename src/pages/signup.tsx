@@ -8,7 +8,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, createUser } from "../firebase";
 import { useRouter } from "next/router";
 
-export default function Login() {
+export default function Signup() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -32,6 +32,18 @@ export default function Login() {
         const user = userCredential.user;
 
         await createUser(email);
+
+        if (user) {
+          const response = await fetch('/api/createApplicant', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: email }), 
+          });
+
+          const data = await response.json();
+        }
 
         router.push("/");
       } catch (error: any) {

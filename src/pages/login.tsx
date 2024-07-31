@@ -4,8 +4,8 @@ import Button from "@/components/Button";
 import Sphere from "../../public/sphere.svg";
 import Google from "../../public/Google.svg";
 import "../app/globals.css";
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth } from "../firebase";
+import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth, createUser } from "../firebase";
 import { useRouter } from "next/router";
 
 const provider = new GoogleAuthProvider();
@@ -15,6 +15,12 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const router = useRouter();
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push("/");
+      }
+    });
 
     const handleSignInEmailPassword = async (e: any) => {
       e.preventDefault();
@@ -35,13 +41,18 @@ export default function Login() {
         const userCredential = await signInWithPopup(auth, provider);
         const credential = GoogleAuthProvider.credentialFromResult(userCredential);
         if (!credential) {
-          // setError("No Google user credential");
+          setError("No Google user credential");
           return;
         }
         const token = credential.accessToken;
         const user = userCredential.user;
+
+        if (user && user.email) {
+          await createUser(user.email)
+        }
+        
       } catch (error: any) {
-        // setError(error.message);
+        setError(error.message);
         return;
       }
     };
