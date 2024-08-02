@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Image from "next/image";
 import Navbar from "@/components/Navbar";
-import Modal from './../components/Modal';
-import "../app/globals.css";
+import Modal from '@/components/Modal';
+import Kyc from '@/components/Kyc'
+import "@/app/globals.css";
 import { getAuth } from 'firebase/auth';
 import { getAcceptedTos, updateTos } from '@/firebase';
 import { useRouter } from 'next/router';
@@ -75,17 +75,17 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center">
-      <Navbar />
+    <main className="flex min-h-screen flex-col items-center gap-6">
+      <Navbar/>
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onAccept={handleAcceptTerms}
       />
-      <div>
-        {/* put progress bars */}
+
+      <div className="flex justify-center w-3/4">
+        <Kyc/>
       </div>
-      <div className="w-3/5" id="sumsub-websdk-container"></div>
     </main>
   );
 }

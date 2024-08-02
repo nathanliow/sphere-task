@@ -25,6 +25,15 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      keyframes: {
+        bounce: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(15px)' },
+        },
+      },
+      animation: {
+        bounce: 'bounce 1.5s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

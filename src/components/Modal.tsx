@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from './Button';
+import Button from '@/components/Button';
 import { updateTos } from '@/firebase';
 import { getAuth } from 'firebase/auth';
 import { terms } from '@/components/Terms';

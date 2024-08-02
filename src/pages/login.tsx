@@ -1,11 +1,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import Button from "@/components/Button";
-import Sphere from "../../public/sphere.svg";
-import Google from "../../public/Google.svg";
-import "../app/globals.css";
+import Sphere from "@/components/Sphere";
+import Google from "/public/Google.svg";
+import "@/app/globals.css";
 import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth, createUser } from "../firebase";
+import { auth, createUser } from "@/firebase";
 import { useRouter } from "next/router";
 
 const provider = new GoogleAuthProvider();
@@ -59,14 +59,7 @@ export default function Login() {
 
     return (
       <main className="flex min-h-screen flex-col items-center p-24">
-        <Image
-          src={Sphere}
-          alt="Sphere Logo"
-          className=""
-          width={100}
-          height={100}
-          priority
-        />
+        <Sphere/>
         <div className="flex flex-col w-full max-w-xs justify-center gap-2 mt-6">  
           <div>
           <h1 className="text-2xl text-black font-bold mb-4">Login to your account</h1>

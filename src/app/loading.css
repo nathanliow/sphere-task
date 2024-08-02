@@ -1,0 +1,27 @@
+.loading-container {
+    --uib-size: 40px;
+    --uib-color: #2C61F9;
+    --uib-speed: .8s;
+    --uib-bg-opacity: 0.1;
+    height: var(--uib-size);
+    width: var(--uib-size);
+    transform-origin: center;
+    animation: rotate var(--uib-speed) linear infinite;
+    will-change: transform;
+    overflow: visible;
+}
+
+.loading-car {
+    fill: none;
+    stroke: var(--uib-color);
+    stroke-dasharray: 25, 75;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    transition: stroke 0.5s ease;
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
