@@ -16,6 +16,18 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const firestore = getFirestore(app);
 
+export async function userExists(email: string) {
+    const usersRef = collection(firestore, 'users');
+    const q = query(usersRef, where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+        return false;
+    }
+
+    return true;
+}
+
 export async function createUser(email: string) {
     try {
         const userData = {

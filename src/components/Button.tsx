@@ -4,9 +4,10 @@ type ButtonProps = {
   variant: 'primary' | 'secondary' | 'tertiary' | 'google' | 'inv-secondary';
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   children: React.ReactNode;
+  disabled?: boolean;
 };
 
-const Button: React.FC<ButtonProps> = ({ variant, onClick, children }) => {
+const Button: React.FC<ButtonProps> = ({ variant, onClick, children, disabled = false }) => {
   let className = '';
 
   switch (variant) {
@@ -14,7 +15,9 @@ const Button: React.FC<ButtonProps> = ({ variant, onClick, children }) => {
       className = 'bg-gradient-to-r from-gradient-start-blue to-gradient-end-blue text-white py-2 px-4 rounded-[20px]';
       break;
     case 'secondary':
-      className = 'w-full bg-blue text-white py-2 px-4 rounded-[10px] hover:bg-dark-blue transition-colors duration-200';
+      className = disabled
+        ? 'w-full bg-light-gray text-dark-gray py-2 px-4 rounded-[10px] cursor-not-allowed'
+        : 'w-full bg-blue text-white py-2 px-4 rounded-[10px] hover:bg-dark-blue transition-colors duration-200';
       break;
     case 'tertiary':
       className = 'bg-white text-black py-2 px-4 border-2 border-gray rounded-[20px]';
@@ -30,7 +33,7 @@ const Button: React.FC<ButtonProps> = ({ variant, onClick, children }) => {
   }
 
   return (
-    <button className={className} onClick={onClick}>
+    <button className={className} onClick={onClick} disabled={disabled}>
       {children}
     </button>
   );

@@ -1,18 +1,18 @@
 import React from 'react';
 import '@/app/loading.css';
 
-const Loading = () => {
+const Loading = ({size = 40}) => {
     return (
         <svg
             className="loading-container"
-            viewBox="0 0 40 40"
-            height="40"
-            width="40"
+            viewBox={`0 0 ${size} ${size}`}
+            height={size}
+            width={size}
         >
             <circle 
                 className="loading-car"
-                cx="20" 
-                cy="20" 
+                cx={size/2}
+                cy={size/2}
                 r="17.5" 
                 pathLength="100" 
                 strokeWidth="5px" 

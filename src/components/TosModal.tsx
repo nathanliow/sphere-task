@@ -11,7 +11,7 @@ type ModalProps = {
   onAccept: () => void;
 };
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onAccept }) => {
+const TosModal: React.FC<ModalProps> = ({ isOpen, onClose, onAccept }) => {
   if (!isOpen) return null;
   const router = useRouter();
 
@@ -52,4 +52,4 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onAccept }) => {
   );
 };
 
-export default Modal;
+export default TosModal;

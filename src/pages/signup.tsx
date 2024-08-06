@@ -4,7 +4,7 @@ import Button from "@/components/Button";
 import Sphere from "@/components/Sphere";
 import "@/app/globals.css";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, createUser } from "@/firebase";
+import { auth, createUser, userExists } from "@/firebase";
 import { useRouter } from "next/router";
 
 export default function Signup() {
@@ -30,20 +30,24 @@ export default function Signup() {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        await createUser(email);
+        const exists = await userExists(email);
 
-        if (user) {
-          const response = await fetch('/api/createApplicant', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: email }), 
-          });
+        if (!exists) {
+          await createUser(email);
 
-          const data = await response.json();
+          if (user) {
+            const response = await fetch('/api/createApplicant', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email: email }), 
+            });
+
+            const data = await response.json();
+          }
         }
-
+        
         router.push("/");
       } catch (error: any) {
         setError("Error signing up");

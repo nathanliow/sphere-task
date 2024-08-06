@@ -5,7 +5,7 @@ import Sphere from "@/components/Sphere";
 import Google from "/public/Google.svg";
 import "@/app/globals.css";
 import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth, createUser } from "@/firebase";
+import { auth, createUser, userExists } from "@/firebase";
 import { useRouter } from "next/router";
 
 const provider = new GoogleAuthProvider();
@@ -48,7 +48,21 @@ export default function Login() {
         const user = userCredential.user;
 
         if (user && user.email) {
-          await createUser(user.email)
+          const exists = await userExists(user.email)
+
+          if (!exists) {
+            await createUser(user.email);
+
+            const response = await fetch('/api/createApplicant', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email: user.email }), 
+            });
+
+            const data = await response.json();
+          }
         }
         
       } catch (error: any) {
