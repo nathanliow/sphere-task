@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
 import { getAuth } from 'firebase/auth';
 
@@ -16,6 +16,7 @@ const Kyc = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [webcamActive, setWebcamActive] = useState(false);
     const [country, setCountry] = useState('');
+    const [savedDocumentType, setSavedDocumentType] = useState('');
     const [documentType, setDocumentType] = useState('');
     const [provideIdDocument, setProvideIdDocument] = useState(false);
     const [provideSelfie, setProvideSelfie] = useState(false);
@@ -38,6 +39,7 @@ const Kyc = () => {
 
     const handleDocumentTypeChange = (event: any) => {
         setDocumentType(event.target.value);
+        setSavedDocumentType(event.target.value);
     };
 
     const handleCapture = async (frontImageSrc: string | null, backImageSrc: string | null) => {
@@ -50,64 +52,96 @@ const Kyc = () => {
                 return;
             }
 
-            if (!frontImageSrc || !backImageSrc) {
-                console.error(`frontImageSrc or backImageSrc null`);
-                return;
-            }
-
             const addDocType = currentStep == 2 ? documentType : 'SELFIE';
 
-            if (addDocType == documentType) {
+            if (addDocType != 'SELFIE') {
+                if (!frontImageSrc || !backImageSrc) {
+                    console.error(`frontImageSrc or backImageSrc null`);
+                    return;
+                }
+
                 setProvideIdDocument(true);
-            }
+                setWebcamActive(false);
 
-            try {
-                if (frontImageSrc) {
-                    const response = await fetch('/api/addDocument', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ 
-                            userId: user.email, 
-                            documentImage: frontImageSrc, 
-                            documentType: addDocType,
-                            documentSide: 'FRONT_SIDE',
-                            country: country,
-                        }),
-                    });
-        
-                    if (!response.ok) {
-                        throw new Error('Failed to add front side document');
-                    }
-                }
-
-                if (backImageSrc) {
-                    const response = await fetch('/api/addDocument', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ 
-                            userId: user.email, 
-                            documentImage: backImageSrc, 
-                            documentType: addDocType,
-                            documentSide: 'BACK_SIDE',
-                            country: country,
-                        }),
-                    });
-        
-                    if (!response.ok) {
-                        throw new Error('Failed to add back side document');
-                    }
-                }
-                
-            } catch (error) {
-                console.error(error);
-            }
+                // add id documents
+                try {
+                    if (frontImageSrc) {
+                        const response = await fetch('/api/addDocument', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ 
+                                userId: user.email, 
+                                documentImage: frontImageSrc, 
+                                documentType: addDocType,
+                                documentSide: 'FRONT_SIDE',
+                                country: country,
+                            }),
+                        });
             
+                        if (!response.ok) {
+                            throw new Error('Failed to add front side document');
+                        }
+                    }
+    
+                    if (backImageSrc) {
+                        const response = await fetch('/api/addDocument', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ 
+                                userId: user.email, 
+                                documentImage: backImageSrc, 
+                                documentType: addDocType,
+                                documentSide: 'BACK_SIDE',
+                                country: country,
+                            }),
+                        });
+            
+                        if (!response.ok) {
+                            throw new Error('Failed to add back side document');
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                if (!frontImageSrc) {
+                    console.error(`frontImageSrc null`);
+                    return;
+                }
 
-            setWebcamActive(false);
+                setProvideSelfie(true);
+                setWebcamActive(false);
+
+                // add selfie document
+                try {
+                    if (frontImageSrc) {
+                        const response = await fetch('/api/addDocument', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ 
+                                userId: user.email, 
+                                documentImage: frontImageSrc, 
+                                documentType: addDocType,
+                                documentSide: null,
+                                country: country,
+                            }),
+                        });
+            
+                        if (!response.ok) {
+                            throw new Error('Failed to add selfie document');
+                        }
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }
         } catch (error) {
             console.error(error);
         }
@@ -128,11 +162,9 @@ const Kyc = () => {
         const reader = new FileReader();
         reader.onloadend = async () => {
             const imageSrc = reader.result as string;
-            const addDocType = currentStep === 2 ? documentType : 'SELFIE';
 
-            if (addDocType == 'SELFIE') {
-                setProvideSelfie(true);
-            }
+            setProvideIdDocument(true);
+            setWebcamActive(false);
 
             try {
                 const response = await fetch('/api/addDocument', {
@@ -143,7 +175,7 @@ const Kyc = () => {
                     body: JSON.stringify({ 
                         userId: user.email, 
                         documentImage: imageSrc, 
-                        documentType: addDocType,
+                        documentType: documentType,
                         country: country,
                     }),
                 });
@@ -590,6 +622,14 @@ const Kyc = () => {
         },
     ];
 
+    useEffect(() => {
+        if (currentStep === 3) {
+            setDocumentType('SELFIE');
+        } else {
+            setDocumentType(savedDocumentType);
+        }
+    }, [currentStep]);
+
     return (
         <div className="w-full h-full">
             {/* progress bars */}
@@ -620,6 +660,7 @@ const Kyc = () => {
 
                 <LiveCaptureModal
                     isActive={webcamActive}
+                    documentType={documentType}
                     onCapture={handleCapture}
                     onCancel={() => setWebcamActive(false)}
                 />

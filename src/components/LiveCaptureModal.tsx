@@ -4,11 +4,12 @@ import Button from '@/components/Button';
 
 interface LiveCaptureModalProps {
     isActive: boolean;
+    documentType: string;
     onCapture: (frontImageSrc: string | null, backImageSrc: string | null) => void;
     onCancel: () => void;
 }
 
-const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, onCapture, onCancel }) => {
+const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, documentType, onCapture, onCancel }) => {
     const webcamRef = useRef<Webcam>(null);
     const [state, setState] = useState<{
         step: 'front' | 'back';
@@ -19,18 +20,26 @@ const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, onCapture
     const handleCapture = useCallback(() => {
         if (webcamRef.current) {
             const imageSrc = webcamRef.current.getScreenshot();
-            setState(prev => ({
-                ...prev,
-                [prev.step === 'front' ? 'frontImageSrc' : 'backImageSrc']: imageSrc,
-            }));
+            if (documentType === 'SELFIE') {
+                setState({ step: 'front', frontImageSrc: imageSrc, backImageSrc: null });
+            } else {
+                setState(prev => ({
+                    ...prev,
+                    [prev.step === 'front' ? 'frontImageSrc' : 'backImageSrc']: imageSrc,
+                }));
+            }
         }
     }, [webcamRef]);
 
     const handleRetake = () => {
-        setState(prev => ({
-            ...prev,
-            [prev.step === 'front' ? 'frontImageSrc' : 'backImageSrc']: null,
-        }));
+        if (documentType === 'SELFIE') {
+            setState({ step: 'front', frontImageSrc: null, backImageSrc: null });
+        } else {
+            setState(prev => ({
+                ...prev,
+                [prev.step === 'front' ? 'frontImageSrc' : 'backImageSrc']: null,
+            }));
+        }
     };
 
     const handleNextStep = () => {
@@ -39,6 +48,10 @@ const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, onCapture
         } else {
             onCapture(state.frontImageSrc, state.backImageSrc);
         }
+    };
+
+    const handleUsePhoto = () => {
+        onCapture(state.frontImageSrc, null);
     };
 
     useEffect(() => {
@@ -52,10 +65,13 @@ const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, onCapture
     return (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-6 rounded-lg flex flex-col w-3/4 items-center gap-6">
-                <div className="text-black text-2xl font">
-                    {state.step === 'front' ? 'Front Side' : 'Back Side'}
-                </div>
+                {(documentType != "SELFIE") &&
+                    <div className="text-black text-2xl font">
+                        {state.step === 'front' ? 'Front Side' : 'Back Side'}
+                    </div>
+                }
                 {(state.step === 'front' && state.frontImageSrc) || (state.step === 'back' && state.backImageSrc) ? (
+                    // changed ImgHTMLAttributes src to string | null
                     <img src={state.step === 'front' ? state.frontImageSrc : state.backImageSrc} alt="Captured" className="" />
                 ) : (
                     <Webcam
@@ -68,7 +84,16 @@ const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, onCapture
                     />
                 )}
                 <div className="flex justify-center gap-12">
-                    {(state.step === 'front' && state.frontImageSrc) || (state.step === 'back' && state.backImageSrc) ? (
+                    {state.frontImageSrc && documentType === 'SELFIE' ? (
+                        <>
+                            <Button variant="tertiary" onClick={handleRetake}>
+                                Retake photo
+                            </Button>
+                            <Button variant="primary" onClick={handleUsePhoto}>
+                                Use photo
+                            </Button>
+                        </>
+                    ) : (state.step === 'front' && state.frontImageSrc) || (state.step === 'back' && state.backImageSrc) ? (
                         <>
                             <Button variant="tertiary" onClick={handleRetake}>
                                 Retake photo

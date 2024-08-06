@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Extract the base64 data
     const ext = documentImage.substring("data:image/".length, documentImage.indexOf(";base64"));
     const base64Data = documentImage.split(',')[1];
-    const filename = `image.${ext}`;
+    const filename = `${documentType}.${ext}`;
     form.append('content', Buffer.from(base64Data, 'base64'), { filename });
 
     // get signature
@@ -41,7 +41,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         method: method,
         headers: {
             'X-Return-Doc-Warnings': 'true',
-            // 'Content-Type': 'multipart/form-data',
             'X-App-Token': process.env.SUMSUB_APP_TOKEN || '',
             'X-App-Access-Ts': ts.toString(),
             'X-App-Access-Sig': signature.digest('hex'),
@@ -52,9 +51,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
 
     const rawData = await response.text();
+    console.log(rawData)
     if (!response.ok) {
         return res.status(response.status).json({ error: 'API call failed', details: rawData });
     }
     const data = JSON.parse(rawData);
+    console.log(data)
     res.status(200).json(data); 
 }
