@@ -190,6 +190,38 @@ const Kyc = () => {
         reader.readAsDataURL(file);
     };
 
+    const handleRequestApplicantCheck = async () => {
+        try {
+            const auth = getAuth();
+            const user = auth.currentUser;
+
+            if (!user || !user.email) {
+                console.error(`User not authenticated or doesn't have email`);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/requestCheck/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        userId: user.email, 
+                    }),
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Failed to request applicant check');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const steps = [
         {
             title: 'Verification for Sphere Labs',
@@ -625,8 +657,12 @@ const Kyc = () => {
     useEffect(() => {
         if (currentStep === 3) {
             setDocumentType('SELFIE');
-        } else {
+        } else if (currentStep === 2) {
             setDocumentType(savedDocumentType);
+        }
+
+        if (currentStep == steps.length - 1) {
+            handleRequestApplicantCheck();
         }
     }, [currentStep]);
 
@@ -635,7 +671,7 @@ const Kyc = () => {
             {/* progress bars */}
 
             <div className="flex flex-col relative items-center border-2 border-gray p-8 rounded-[20px] gap-10">
-                {currentStep > 0 && (
+                {currentStep > 0 && currentStep < steps.length - 1 && (
                     <FaChevronLeft
                         onClick={handlePrev}
                         className="absolute top-8 left-8 text-xl cursor-pointer"
