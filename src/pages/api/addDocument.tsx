@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import FormData from 'form-data';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { userId, documentImage, documentType, country } = req.body;
+    const { userId, documentImage, documentType, documentSide, country } = req.body;
 
     // get applicantId 
     const appIdResponse = await fetch(`${req.headers.origin}/api/getApplicantId?userId=${encodeURIComponent(userId)}`, {
@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Create FormData
     let form = new FormData();
-    form.append('metadata', JSON.stringify({ idDocType: documentType, country: country }));
+    form.append('metadata', JSON.stringify({ idDocType: documentType, idDocSubType: documentSide, country: country }));
     
     // Extract the base64 data
     const ext = documentImage.substring("data:image/".length, documentImage.indexOf(";base64"));
@@ -49,15 +49,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
         body: body as any,
     });
+    
 
-    console.log(response)
     const rawData = await response.text();
-    console.log(rawData)
-
     if (!response.ok) {
         return res.status(response.status).json({ error: 'API call failed', details: rawData });
     }
-
     const data = JSON.parse(rawData);
     res.status(200).json(data); 
 }

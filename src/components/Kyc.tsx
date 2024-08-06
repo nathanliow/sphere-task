@@ -40,7 +40,7 @@ const Kyc = () => {
         setDocumentType(event.target.value);
     };
 
-    const handleCapture = async (imageSrc: string | null) => {
+    const handleCapture = async (frontImageSrc: string | null, backImageSrc: string | null) => {
         try {
             const auth = getAuth();
             const user = auth.currentUser;
@@ -50,8 +50,8 @@ const Kyc = () => {
                 return;
             }
 
-            if (!imageSrc) {
-                console.error(`imageSrc null`);
+            if (!frontImageSrc || !backImageSrc) {
+                console.error(`frontImageSrc or backImageSrc null`);
                 return;
             }
 
@@ -62,22 +62,46 @@ const Kyc = () => {
             }
 
             try {
-                const response = await fetch('/api/addDocument', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        userId: user.email, 
-                        documentImage: imageSrc, 
-                        documentType: addDocType,
-                        country: country,
-                    }),
-                });
-    
-                if (!response.ok) {
-                    throw new Error('Failed to add document');
+                if (frontImageSrc) {
+                    const response = await fetch('/api/addDocument', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            userId: user.email, 
+                            documentImage: frontImageSrc, 
+                            documentType: addDocType,
+                            documentSide: 'FRONT_SIDE',
+                            country: country,
+                        }),
+                    });
+        
+                    if (!response.ok) {
+                        throw new Error('Failed to add front side document');
+                    }
                 }
+
+                if (backImageSrc) {
+                    const response = await fetch('/api/addDocument', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            userId: user.email, 
+                            documentImage: backImageSrc, 
+                            documentType: addDocType,
+                            documentSide: 'BACK_SIDE',
+                            country: country,
+                        }),
+                    });
+        
+                    if (!response.ok) {
+                        throw new Error('Failed to add back side document');
+                    }
+                }
+                
             } catch (error) {
                 console.error(error);
             }

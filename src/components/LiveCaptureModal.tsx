@@ -4,32 +4,46 @@ import Button from '@/components/Button';
 
 interface LiveCaptureModalProps {
     isActive: boolean;
-    onCapture: (imageSrc: string | null) => void; 
+    onCapture: (frontImageSrc: string | null, backImageSrc: string | null) => void;
     onCancel: () => void;
 }
 
 const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, onCapture, onCancel }) => {
     const webcamRef = useRef<Webcam>(null);
-    const [capturedImage, setCapturedImage] = useState<string | null>(null);
+    const [state, setState] = useState<{
+        step: 'front' | 'back';
+        frontImageSrc: string | null;
+        backImageSrc: string | null;
+    }>({ step: 'front', frontImageSrc: null, backImageSrc: null });
 
     const handleCapture = useCallback(() => {
         if (webcamRef.current) {
             const imageSrc = webcamRef.current.getScreenshot();
-            setCapturedImage(imageSrc);
+            setState(prev => ({
+                ...prev,
+                [prev.step === 'front' ? 'frontImageSrc' : 'backImageSrc']: imageSrc,
+            }));
         }
     }, [webcamRef]);
 
     const handleRetake = () => {
-        setCapturedImage(null);
+        setState(prev => ({
+            ...prev,
+            [prev.step === 'front' ? 'frontImageSrc' : 'backImageSrc']: null,
+        }));
     };
 
-    const handleUsePhoto = () => {
-        onCapture(capturedImage); 
+    const handleNextStep = () => {
+        if (state.step === 'front') {
+            setState(prev => ({ ...prev, step: 'back' }));
+        } else {
+            onCapture(state.frontImageSrc, state.backImageSrc);
+        }
     };
 
     useEffect(() => {
         if (isActive) {
-            setCapturedImage(null);
+            setState({ step: 'front', frontImageSrc: null, backImageSrc: null });
         }
     }, [isActive]);
 
@@ -38,8 +52,11 @@ const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, onCapture
     return (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-6 rounded-lg flex flex-col w-3/4 items-center gap-6">
-                {capturedImage ? (
-                    <img src={capturedImage} alt="Captured" className="" />
+                <div className="text-black text-2xl font">
+                    {state.step === 'front' ? 'Front Side' : 'Back Side'}
+                </div>
+                {(state.step === 'front' && state.frontImageSrc) || (state.step === 'back' && state.backImageSrc) ? (
+                    <img src={state.step === 'front' ? state.frontImageSrc : state.backImageSrc} alt="Captured" className="" />
                 ) : (
                     <Webcam
                         audio={false}
@@ -51,13 +68,13 @@ const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, onCapture
                     />
                 )}
                 <div className="flex justify-center gap-12">
-                    {capturedImage ? (
+                    {(state.step === 'front' && state.frontImageSrc) || (state.step === 'back' && state.backImageSrc) ? (
                         <>
                             <Button variant="tertiary" onClick={handleRetake}>
                                 Retake photo
                             </Button>
-                            <Button variant="primary" onClick={handleUsePhoto}>
-                                Use photo
+                            <Button variant="primary" onClick={handleNextStep}>
+                                {state.step === 'front' ? 'Next: Capture Back' : 'Use photos'}
                             </Button>
                         </>
                     ) : (
