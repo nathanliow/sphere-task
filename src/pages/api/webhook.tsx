@@ -1,3 +1,4 @@
+import { buffer } from 'micro'
 import { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
 import { updateKycStatus } from '@/firebase';
@@ -10,11 +11,14 @@ export const config = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
+    const rawBody = (await buffer(req)).toString()
+    const data = JSON.parse(rawBody)
+
     const sig = req.headers['x-payload-digest'];
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
     const calculatedDigest = crypto
         .createHmac('sha256', secretKey)
-        .update(req.body)
+        .update(rawBody)
         .digest('hex')
 
     if (calculatedDigest !== sig) {
