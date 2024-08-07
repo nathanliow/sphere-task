@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .digest('hex')
 
     if (calculatedDigest !== sig) {
-      return res.status(400).send(`Invalid signature: ${sig}`);
+      return res.status(400).send(`Invalid signature: ${calculatedDigest} !== ${sig}`);
     }
 
     const body = JSON.parse(rawBody.toString());
