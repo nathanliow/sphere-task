@@ -12,7 +12,6 @@ export const config = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const rawBody = await buffer(req);
-
     const sig = req.headers['x-payload-digest'];
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
     const calculatedDigest = crypto
@@ -21,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .digest('hex')
 
     if (calculatedDigest !== sig) {
-      return res.status(400).send('Invalid signature');
+      return res.status(400).send(`Invalid signature: ${sig}`);
     }
 
     const body = JSON.parse(rawBody.toString());
