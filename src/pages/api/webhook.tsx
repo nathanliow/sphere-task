@@ -11,21 +11,21 @@ export const config = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const rawBody = (await buffer(req)).toString()
-    const data = JSON.parse(rawBody)
+    const rawBody = await buffer(req);
 
     const sig = req.headers['x-payload-digest'];
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
     const calculatedDigest = crypto
         .createHmac('sha256', secretKey)
-        .update(data)
+        .update(rawBody)
         .digest('hex')
 
     if (calculatedDigest !== sig) {
       return res.status(400).send('Invalid signature');
     }
 
-    const { externalUserId, reviewResult } = req.body;
+    const body = JSON.parse(rawBody.toString());
+    const { externalUserId, reviewResult } = body;
 
     if (!externalUserId || !reviewResult) {
         return res.status(400).json({ error: 'Missing required fields' });
