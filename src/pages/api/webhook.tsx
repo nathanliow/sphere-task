@@ -1,3 +1,4 @@
+import { buffer } from 'micro'
 import { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
 import { updateKycStatus } from '@/firebase';
@@ -16,11 +17,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    const rawBody = (await buffer(req)).toString()
+    const data = JSON.parse(rawBody)
+
     const sig = req.headers['x-payload-digest'];
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
     const calculatedDigest = crypto
         .createHmac('HMAC_SHA256_HEX', secretKey)
-        .update(req.body)
+        .update(rawBody)
         .digest('hex')
 
     if (calculatedDigest !== sig) {
