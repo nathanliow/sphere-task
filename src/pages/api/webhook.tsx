@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'POST') {
     const rawBody = await buffer(req);
     const sig = req.headers['x-payload-digest'];
-    const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
+    const secretKey = process.env.SUMSUB_SECRET_KEY || '';
     const calculatedDigest = crypto
         .createHmac('sha256', secretKey)
         .update(rawBody)
