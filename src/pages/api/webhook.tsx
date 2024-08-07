@@ -11,12 +11,6 @@ export const config = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { externalUserId, reviewResult } = req.body;
-
-    if (!externalUserId || !reviewResult) {
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
-
     const rawBody = (await buffer(req)).toString()
     const data = JSON.parse(rawBody)
 
@@ -29,6 +23,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (calculatedDigest !== sig) {
       return res.status(400).send('Invalid signature');
+    }
+
+    const { externalUserId, reviewResult } = req.body;
+
+    if (!externalUserId || !reviewResult) {
+        return res.status(400).json({ error: 'Missing required fields' });
     }
 
     const reviewAnswer = reviewResult.reviewAnswer;
@@ -57,6 +57,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).send('Webhook received');
   } else {
     res.setHeader('Allow', 'POST');
-    res.status(405).end('Method Not Allowed');
+    res.status(405).end(`Method Not Allowed`);
   }
 }
