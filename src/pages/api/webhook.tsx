@@ -13,11 +13,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const buf = await buffer(req);
     const sig = req.headers['x-payload-digest'];
     const secretKey = process.env.SUMSUB_SECRET_KEY || '';
-    const hmac = crypto.createHmac('sha256', secretKey);
-    hmac.update(buf);
-    const digest = hmac.digest('hex');
+    const calculatedDigest = crypto
+        .createHmac('HMAC_SHA256_HEX', secretKey)
+        .update(req.body)
+        .digest('hex')
 
-    if (digest !== sig) {
+    if (calculatedDigest !== sig) {
       return res.status(400).send('Invalid signature');
     }
 
