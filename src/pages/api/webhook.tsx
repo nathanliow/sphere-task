@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const sig = req.headers['x-payload-digest'];
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
     const calculatedDigest = crypto
-        .createHmac('HMAC_SHA256_HEX', secretKey)
+        .createHmac('sha256', secretKey)
         .update(rawBody)
         .digest('hex')
 
