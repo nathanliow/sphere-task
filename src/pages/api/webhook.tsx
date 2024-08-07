@@ -1,6 +1,6 @@
-import { buffer } from 'micro';
 import { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
+import { updateKycStatus } from '@/firebase';
 
 export const config = {
   api: {
@@ -10,9 +10,14 @@ export const config = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const buf = await buffer(req);
+    const { externalUserId, reviewResult } = req.body;
+
+    if (!externalUserId || !reviewResult) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
     const sig = req.headers['x-payload-digest'];
-    const secretKey = process.env.SUMSUB_SECRET_KEY || '';
+    const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
     const calculatedDigest = crypto
         .createHmac('HMAC_SHA256_HEX', secretKey)
         .update(req.body)
@@ -22,12 +27,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).send('Invalid signature');
     }
 
-    const event = JSON.parse(buf.toString());
+    const reviewAnswer = reviewResult.reviewAnswer;
+    const moderationComment = reviewResult.moderationComment;;
 
-    // Handle the webhook event
-    console.log('Received webhook:', event);
+    let newKycStatus = "incomplete";
+    if (reviewAnswer === 'GREEN') {
+        newKycStatus = 'approved';
+    } else {
+        if (reviewResult.reviewRejectType == "RETRY") {
+            newKycStatus = 'tempReject';
+        } else if (reviewResult.reviewRejectType == "FINAL") {
+            newKycStatus = 'finalReject';
+        }
+    }
+    
+    // update user kycStatus
+    try {
+        await updateKycStatus(externalUserId, newKycStatus);
+        // res.status(200).json({ message: 'KYC status updated successfully' });
+    } catch (error) {
+        console.error('Error updating KYC status:', error);
+        // res.status(500).json({ error: 'Internal Server Error' });
+    }
 
-    // Respond to Sumsub to acknowledge receipt
     res.status(200).send('Webhook received');
   } else {
     res.setHeader('Allow', 'POST');

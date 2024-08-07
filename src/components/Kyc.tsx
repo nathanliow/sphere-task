@@ -246,8 +246,15 @@ const Kyc = () => {
             if (user && user.email) {
                 const kycStatus = await getKycStatus(user.email);
                 setKycStatus(kycStatus);
-                if (kycStatus != "incomplete") {
+
+                if (kycStatus === "pending") {
                     setCurrentStep(4);
+                } else if (kycStatus === "approved") {
+                    setCurrentStep(5);
+                } else if (kycStatus === "tempReject") {
+                    setCurrentStep(6);
+                } else if (kycStatus === "finalReject") {
+                    setCurrentStep(7);
                 }
             }
         };
@@ -681,6 +688,30 @@ const Kyc = () => {
                 </div> 
             ),
         },
+        {
+            title: 'You have successfully verified',
+            content: (
+                <div className="flex flex-col justify-center items-center gap-8">
+
+                </div> 
+            ),
+        },
+        {
+            title: 'Please verify again',
+            content: (
+                <div className="flex flex-col justify-center items-center gap-8">
+
+                </div> 
+            ),
+        },
+        {
+            title: 'You have been rejected',
+            content: (
+                <div className="flex flex-col justify-center items-center gap-8">
+
+                </div> 
+            ),
+        },  
     ];
 
     return (
