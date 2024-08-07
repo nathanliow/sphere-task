@@ -33,6 +33,8 @@ export async function createUser(email: string) {
         const userData = {
             email: email,
             acceptedTos: false,
+            // incomplete | pending | approved | tempReject | finalReject
+            kycStatus: 'incomplete',
         }
 
         await addDoc(collection(firestore, 'users'), userData);
@@ -82,6 +84,49 @@ export async function updateTos(email: string) {
         });
 
         return true;
+        
+    } catch (error) {
+        return false;
+    }
+}
+
+export async function updateKycStatus(email: string, status: string) {
+    try {
+        const usersRef = collection(firestore, 'users');
+        const q = query(usersRef, where('email', '==', email));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            // No user found with the given email
+            return false;
+        }
+
+        const userDoc = querySnapshot.docs[0];
+        const userDocRef = doc(firestore, 'users', userDoc.id);
+        
+        await updateDoc(userDocRef, {
+            kycStatus: status,
+        });
+
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+export async function getKycStatus(email: string) {
+    try {
+        const usersRef = collection(firestore, 'users');
+        const q = query(usersRef, where('email', '==', email));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            // No user found with the given email
+            return false;
+        }
+
+        const userDoc = querySnapshot.docs[0];
+        return userDoc.data().kycStatus;
         
     } catch (error) {
         return false;

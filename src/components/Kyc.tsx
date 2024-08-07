@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
 import { getAuth } from 'firebase/auth';
+import { updateKycStatus, getKycStatus } from '@/firebase';
 
 // icons
 import Loading from "@/components/Loading";
@@ -20,6 +21,7 @@ const Kyc = () => {
     const [documentType, setDocumentType] = useState('');
     const [provideIdDocument, setProvideIdDocument] = useState(false);
     const [provideSelfie, setProvideSelfie] = useState(false);
+    const [kycStatus, setKycStatus] = useState('');
 
     const handleNext = () => {
         setCurrentStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
@@ -214,6 +216,9 @@ const Kyc = () => {
                 if (!response.ok) {
                     throw new Error('Failed to request applicant check');
                 }
+
+                // update kycStatus to pending
+                await updateKycStatus(user.email, "pending");
             } catch (error) {
                 console.error(error);
             }
@@ -221,6 +226,34 @@ const Kyc = () => {
             console.error(error);
         }
     };
+
+    useEffect(() => {
+        if (currentStep === 3) {
+            setDocumentType('SELFIE');
+        } else if (currentStep === 2) {
+            setDocumentType(savedDocumentType);
+        }
+
+        if (currentStep == 4 && kycStatus == "incomplete") {
+            handleRequestApplicantCheck();
+        }
+    }, [currentStep]);
+
+    useEffect(() => {
+        const checkKycStatus = async () => {
+          const auth = getAuth();
+          const user = auth.currentUser;
+          if (user && user.email) {
+            const kycStatus = await getKycStatus(user.email);
+            setKycStatus(kycStatus);
+            if (kycStatus != "incomplete") {
+              setCurrentStep(4);
+            }
+          }
+        };
+    
+        checkKycStatus();
+      }, []);
 
     const steps = [
         {
@@ -644,34 +677,18 @@ const Kyc = () => {
                             <IoCheckmarkCircleOutline size={24} color={'lime'}/>
                             <div className="text-black text-md">Selfie</div>
                         </div>
-                        <div className="flex flex-hor gap-4">
-                            <IoCloseCircleOutline size={24} color={'red'}/>
-                            <div className="text-black text-md">Finish</div>
-                        </div>
                     </div>
                 </div> 
             ),
         },
     ];
 
-    useEffect(() => {
-        if (currentStep === 3) {
-            setDocumentType('SELFIE');
-        } else if (currentStep === 2) {
-            setDocumentType(savedDocumentType);
-        }
-
-        if (currentStep == steps.length - 1) {
-            handleRequestApplicantCheck();
-        }
-    }, [currentStep]);
-
     return (
         <div className="w-full h-full">
             {/* progress bars */}
 
             <div className="flex flex-col relative items-center border-2 border-gray p-8 rounded-[20px] gap-10">
-                {currentStep > 0 && currentStep < steps.length - 1 && (
+                {currentStep > 0 && currentStep < 4 && (
                     <FaChevronLeft
                         onClick={handlePrev}
                         className="absolute top-8 left-8 text-xl cursor-pointer"
@@ -680,7 +697,7 @@ const Kyc = () => {
                 <div className="text-black text-xl font-bold">{steps[currentStep].title}</div>
                 <div>{steps[currentStep].content}</div>
 
-                {currentStep < steps.length - 1 && (<div className="flex flex-col justify-center w-1/2">
+                {currentStep < 4 && (<div className="flex flex-col justify-center w-1/2">
                     <Button 
                         variant="secondary" 
                         onClick={handleNext} 
