@@ -2,7 +2,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Button from "@/components/Button";
 import Sphere from "@/components/Sphere";
-import Google from "/public/Google.svg";
+import Google from "/public/google.svg";
 import "@/app/globals.css";
 import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth, createUser, userExists } from "@/firebase";
