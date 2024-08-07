@@ -1,11 +1,11 @@
 import { useState } from "react";
-import Image from "next/image";
 import Button from "@/components/Button";
 import Sphere from "@/components/Sphere";
 import "@/app/globals.css";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, createUser, userExists } from "@/firebase";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 export default function Signup() {
     const [email, setEmail] = useState("");
@@ -59,7 +59,7 @@ export default function Signup() {
         <Sphere/>
         <div className="flex flex-col w-full max-w-xs justify-center gap-2 mt-6">  
           <div>
-          <h1 className="text-2xl text-black font-bold mb-4">Create an account</h1>
+          <div className="text-2xl text-black font-bold mb-4">Create an account</div>
             <form onSubmit={handleSignUp}>
               <label htmlFor="email" className="block text-sm font-medium text-black">
                 Email
@@ -111,7 +111,7 @@ export default function Signup() {
           </div>
 
           <div className="flex items-center justify-center mt-2">
-            <a className="flex-shrink mx-2 text-xs text-blue" href='/login'>Already have an account?</a>
+            <Link className="flex-shrink mx-2 text-xs text-blue" href='/login'>Already have an account?</Link>
           </div>
 
         </div>

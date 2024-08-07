@@ -13,11 +13,6 @@ type ModalProps = {
 
 const TosModal: React.FC<ModalProps> = ({ isOpen, onClose, onAccept }) => {
   if (!isOpen) return null;
-  const router = useRouter();
-
-  const handleDeny = async () => {
-    router.push("/login");
-  };
 
   const handleAccept = async () => {
     const auth = getAuth();
@@ -40,9 +35,6 @@ const TosModal: React.FC<ModalProps> = ({ isOpen, onClose, onAccept }) => {
           <div dangerouslySetInnerHTML={{ __html: terms }} />
         </div>
         <div className="flex justify-center gap-12">
-          <Button variant="tertiary" onClick={handleDeny}>
-              Deny
-          </Button>
           <Button variant="primary" onClick={handleAccept}>
               Accept
           </Button>

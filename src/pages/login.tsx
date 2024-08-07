@@ -7,6 +7,7 @@ import "@/app/globals.css";
 import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth, createUser, userExists } from "@/firebase";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const provider = new GoogleAuthProvider();
 
@@ -76,7 +77,7 @@ export default function Login() {
         <Sphere/>
         <div className="flex flex-col w-full max-w-xs justify-center gap-2 mt-6">  
           <div>
-          <h1 className="text-2xl text-black font-bold mb-4">Login to your account</h1>
+          <div className="text-2xl text-black font-bold mb-4">Login to your account</div>
             <form onSubmit={handleSignInEmailPassword}>
               <label htmlFor="email" className="block text-sm font-medium text-black">
                 Email
@@ -135,7 +136,7 @@ export default function Login() {
           </div>
 
           <div className="flex items-center justify-center mt-2">
-            <a className="flex-shrink mx-2 text-xs text-blue" href='/signup'>Don't have an account?</a>
+            <Link className="flex-shrink mx-2 text-xs text-blue" href='/signup'>{`Don't have an account?`}</Link>
           </div>
 
         </div>

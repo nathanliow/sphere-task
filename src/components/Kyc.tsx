@@ -192,41 +192,6 @@ const Kyc = () => {
         reader.readAsDataURL(file);
     };
 
-    const handleRequestApplicantCheck = async () => {
-        try {
-            const auth = getAuth();
-            const user = auth.currentUser;
-
-            if (!user || !user.email) {
-                console.error(`User not authenticated or doesn't have email`);
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/requestCheck/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        userId: user.email, 
-                    }),
-                });
-    
-                if (!response.ok) {
-                    throw new Error('Failed to request applicant check');
-                }
-
-                // update kycStatus to pending
-                await updateKycStatus(user.email, "pending");
-            } catch (error) {
-                console.error(error);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
     useEffect(() => {
         if (currentStep === 3) {
             setDocumentType('SELFIE');
@@ -235,21 +200,56 @@ const Kyc = () => {
         }
 
         if (currentStep == 4 && kycStatus == "incomplete") {
+            const handleRequestApplicantCheck = async () => {
+                try {
+                    const auth = getAuth();
+                    const user = auth.currentUser;
+        
+                    if (!user || !user.email) {
+                        console.error(`User not authenticated or doesn't have email`);
+                        return;
+                    }
+        
+                    try {
+                        const response = await fetch('/api/requestCheck/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ 
+                                userId: user.email, 
+                            }),
+                        });
+            
+                        if (!response.ok) {
+                            throw new Error('Failed to request applicant check');
+                        }
+        
+                        // update kycStatus to pending
+                        await updateKycStatus(user.email, "pending");
+                    } catch (error) {
+                        console.error(error);
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+
             handleRequestApplicantCheck();
         }
-    }, [currentStep]);
+    }, [currentStep, kycStatus, savedDocumentType]);
 
     useEffect(() => {
         const checkKycStatus = async () => {
-          const auth = getAuth();
-          const user = auth.currentUser;
-          if (user && user.email) {
-            const kycStatus = await getKycStatus(user.email);
-            setKycStatus(kycStatus);
-            if (kycStatus != "incomplete") {
-              setCurrentStep(4);
+            const auth = getAuth();
+            const user = auth.currentUser;
+            if (user && user.email) {
+                const kycStatus = await getKycStatus(user.email);
+                setKycStatus(kycStatus);
+                if (kycStatus != "incomplete") {
+                    setCurrentStep(4);
+                }
             }
-          }
         };
     
         checkKycStatus();
@@ -561,7 +561,7 @@ const Kyc = () => {
                                 </div>
                             </label>
                             <label className="flex items-center justify-between gap-2 cursor-pointer bg-light-gray rounded-[10px] px-4 py-2">                              
-                                <div>Driver's License</div>
+                                <div>{`Driver's License`}</div>
                                 <input
                                     type="radio"
                                     name="documentType"
@@ -629,7 +629,7 @@ const Kyc = () => {
                         </div>
                         <div className="flex flex-hor gap-4">
                             <IoCloseCircleOutline size={24} color={'red'}/>
-                            <div className="text-black text-md">Don't edit images of your document</div>
+                            <div className="text-black text-md">{`Don't edit images of your document`}</div>
                         </div>
                     </div>
                 </div>     
@@ -656,7 +656,7 @@ const Kyc = () => {
                         </div>
                         <div className="flex flex-hor gap-4">
                             <IoCloseCircleOutline size={24} color={'red'}/>
-                            <div className="text-black text-md">Don't wear hats, glasses, and masks</div>
+                            <div className="text-black text-md">{`Don't wear hats, glasses, and masks`}</div>
                         </div>
                     </div>
                 </div> 

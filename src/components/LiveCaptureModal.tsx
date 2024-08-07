@@ -1,6 +1,7 @@
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import Button from '@/components/Button';
+import Image from 'next/image';
 
 interface LiveCaptureModalProps {
     isActive: boolean;
@@ -29,7 +30,7 @@ const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, documentT
                 }));
             }
         }
-    }, [webcamRef]);
+    }, [webcamRef, documentType]);
 
     const handleRetake = () => {
         if (documentType === 'SELFIE') {
@@ -71,8 +72,13 @@ const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, documentT
                     </div>
                 }
                 {(state.step === 'front' && state.frontImageSrc) || (state.step === 'back' && state.backImageSrc) ? (
-                    // changed ImgHTMLAttributes src to string | null
-                    <img src={state.step === 'front' ? state.frontImageSrc : state.backImageSrc} alt="Captured" className="" />
+                    state.step === 'front' && state.frontImageSrc ? (
+                        <Image src={state.frontImageSrc} alt="Captured front" className="" />
+                    ) : (
+                        state.step === 'back' && state.backImageSrc && (
+                            <Image src={state.backImageSrc} alt="Captured back" className="" />
+                        )
+                    )
                 ) : (
                     <Webcam
                         audio={false}
