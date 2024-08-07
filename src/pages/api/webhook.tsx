@@ -2,6 +2,7 @@ import { buffer } from 'micro'
 import { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
 import { updateKycStatus } from '@/firebase';
+import type { Readable } from 'node:stream';
 
 export const config = {
   api: {
@@ -11,7 +12,8 @@ export const config = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const rawBody = await buffer(req);
+    // const rawBody = await buffer(req);
+    const rawBody = await getRawBody(req);
     const sig = req.headers['x-payload-digest'];
     const alg = req.headers['x-payload-digest-alg'];
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
@@ -35,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .digest('hex')
 
     if (calculatedDigest !== sig) {
-      return res.status(400).send(`Invalid signature: ${calculatedDigest} !== ${sig}`);
+      return res.status(400).send(`Invalid signature: ${algorithm}: ${calculatedDigest} !== ${sig}`);
     }
 
     const body = JSON.parse(rawBody.toString());
@@ -74,3 +76,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(405).end(`Method Not Allowed`);
   }
 }
+
+async function getRawBody(readable: Readable): Promise<Buffer> {
+    const chunks = [];
+    for await (const chunk of readable) {
+      chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+    }
+    return Buffer.concat(chunks);
+  }
