@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // }
 
     if (!verifySignature(rawBody, sig, secretKey)) {
-        return res.status(400).send(`Invalid signature: ${Buffer.from(crypto.createHmac('sha256', secretKey).update(rawBody).digest('hex'), 'utf8')} !== ${Buffer.from(sig, 'utf8')}\n${rawBody}`);
+        return res.status(400).send(`Invalid signature: ${(crypto.createHmac('sha256', secretKey).update(rawBody).digest('hex'))} !== ${sig}\n${rawBody}`);
     }
 
     const body = JSON.parse(rawBody.toString());
