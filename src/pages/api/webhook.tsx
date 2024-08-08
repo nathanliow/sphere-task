@@ -4,15 +4,16 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
 import { updateKycStatus } from '@/firebase';
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// export const config = {
+//   api: {
+//     bodyParser: false,
+//   },
+// };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const rawBody = await getRawBody(req)
+    // const rawBody = await getRawBody(req)
+    const rawBody = await buffer(req.body);
     const sig = req.headers['x-payload-digest'];
 
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
