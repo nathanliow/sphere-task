@@ -4,27 +4,29 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
 import { updateKycStatus } from '@/firebase';
 
-// export const config = {
-//   api: {
-//     bodyParser: false,
-//   },
-// };
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    // const rawBody = await getRawBody(req)
-    const rawBody = await buffer(req.body);
-    const sig = req.headers['x-payload-digest'];
-
+    const rawBody = await buffer(req);
+    const sigHeader = req.headers['x-payload-digest'];
+    const sig = (Array.isArray(sigHeader) ? sigHeader[0] : sigHeader) || '';
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
 
     const calculatedDigest = crypto.createHmac('sha256', secretKey)
         .update(rawBody)
         .digest('hex');
 
-    if (calculatedDigest !== sig) {
-        
-        return res.status(400).send(`Invalid signature: ${calculatedDigest} !== ${sig}\n${rawBody}`);
+    // if (calculatedDigest !== sig) {
+    //     return res.status(400).send(`Invalid signature: ${calculatedDigest} !== ${sig}\n${rawBody}`);
+    // }
+
+    if (!verifySignature(rawBody, sig, secretKey)) {
+        throw new Error('Invalid signature.');
     }
 
     const body = JSON.parse(rawBody.toString());
@@ -63,3 +65,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(405).end(`Method Not Allowed`);
   }
 }
+
+export const verifySignature = (rawBody: Buffer, signature: string, secret: string): boolean => {
+    const hmac = crypto.createHmac('sha256', secret);
+    const digest = Buffer.from(hmac.update(rawBody).digest('hex'), 'utf8');
+    const receivedSignature = Buffer.from(signature, 'utf8');
+
+    return crypto.timingSafeEqual(digest, receivedSignature);
+};
