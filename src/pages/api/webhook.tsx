@@ -2,6 +2,8 @@ import { buffer } from 'micro'
 import { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
 import { updateKycStatus } from '@/firebase';
+import { NextRequest } from "next/server";
+
 
 export const config = {
   api: {
@@ -9,17 +11,19 @@ export const config = {
   },
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const rawBody = await buffer(req);
-    const sigHeader = req.headers['x-payload-digest'];
-    const sig = (Array.isArray(sigHeader) ? sigHeader[0] : sigHeader) || '';
+    // const rawBody = await buffer(req);
+    const rawBody = await req.text();
+    // const sigHeader = req.headers['x-payload-digest'];
+    const sig = req.headers.get('x-payload-digest');
+    // const sig = (Array.isArray(sigHeader) ? sigHeader[0] : sigHeader) || '';
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
-    const calculatedDigest = crypto.createHmac('sha256', secretKey)
-        .update(rawBody)
-        .digest('hex');
+    const calculatedDigest = crypto.createHmac("sha256", secretKey);
+    calculatedDigest.update(rawBody);
+    const finalDigest = calculatedDigest.digest('hex');
 
-    if (calculatedDigest !== sig) {
+    if (finalDigest !== sig) {
         return res.status(400).send(`Invalid signature`);
     }
 
