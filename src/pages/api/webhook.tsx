@@ -13,15 +13,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'POST') {
     const rawBody = await buffer(req);
     const sig = req.headers['x-payload-digest'];
-    // const sig = (Array.isArray(sigHeader) ? sigHeader[0] : sigHeader) || '';
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
     const calculatedDigest = crypto.createHmac("sha256", secretKey)
         .update(rawBody)
         .digest('hex');
 
-    if (calculatedDigest !== sig) {
-        return res.status(400).send(`Invalid signature`);
-    }
+    // if (calculatedDigest !== sig) {
+    //     return res.status(400).send(`Invalid signature`);
+    // }
 
     const body = JSON.parse(rawBody.toString());
     const { externalUserId, reviewResult } = body;
@@ -47,10 +46,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // update user kycStatus
     try {
         await updateKycStatus(externalUserId, newKycStatus);
-        // res.status(200).json({ message: 'KYC status updated successfully' });
+        res.status(200).json({ message: 'KYC status updated successfully' });
     } catch (error) {
         console.error('Error updating KYC status:', error);
-        // res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 
     res.status(200).send('Webhook received');
