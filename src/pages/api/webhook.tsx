@@ -1,5 +1,4 @@
 import { buffer } from 'micro'
-import getRawBody from 'raw-body'
 import { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
 import { updateKycStatus } from '@/firebase';
@@ -12,21 +11,16 @@ export const config = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const rawBody = await buffer(req);
+    const rawBody = await buffer(req.body);
     const sigHeader = req.headers['x-payload-digest'];
     const sig = (Array.isArray(sigHeader) ? sigHeader[0] : sigHeader) || '';
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
-
     const calculatedDigest = crypto.createHmac('sha256', secretKey)
         .update(rawBody)
         .digest('hex');
 
-    // if (calculatedDigest !== sig) {
-    //     return res.status(400).send(`Invalid signature: ${calculatedDigest} !== ${sig}\n${rawBody}`);
-    // }
-
     if (!verifySignature(rawBody, sig, secretKey)) {
-        return res.status(400).send(`Invalid signature: ${(crypto.createHmac('sha256', secretKey).update(rawBody).digest('hex'))} !== ${sig}\n${rawBody}`);
+        return res.status(400).send(`Invalid signature`);
     }
 
     const body = JSON.parse(rawBody.toString());
@@ -70,6 +64,5 @@ export const verifySignature = (rawBody: Buffer, signature: string, secret: stri
     const hmac = crypto.createHmac('sha256', secret);
     const digest = Buffer.from(hmac.update(rawBody).digest('hex'), 'utf8');
     const receivedSignature = Buffer.from(signature, 'utf8');
-
-    return crypto.timingSafeEqual(digest, receivedSignature);
+   return crypto.timingSafeEqual(digest, receivedSignature);
 };
