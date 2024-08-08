@@ -11,34 +11,17 @@ export const config = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    // const rawBody = await buffer(req);
-    const buf = await buffer(req);
-    const rawBody = buf.toString('utf8');
+    const rawBody = await buffer(req);
     const sig = req.headers['x-payload-digest'];
-    const algo = req.headers['x-payload-digest-alg'];
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
 
-    let algorithm: string;
-    switch (algo) {
-        case 'HMAC_SHA1_HEX':
-            algorithm = 'sha1';
-            break;
-        case 'HMAC_SHA256_HEX':
-            algorithm = 'sha256';
-            break;
-        case 'HMAC_SHA512_HEX':
-            algorithm = 'sha512';
-            break;
-        default:
-            return res.status(400).send('Unsupported HMAC algorithm');
-    }
-
-    const calculatedDigest = crypto.createHmac(algorithm, secretKey)
+    const calculatedDigest = crypto.createHmac('sha256', secretKey)
         .update(rawBody)
         .digest('hex');
 
     if (calculatedDigest !== sig) {
-      return res.status(400).send(`Invalid signature: ${algorithm} ${calculatedDigest} !== ${sig}\n ${rawBody}`);
+        
+        return res.status(400).send(`Invalid signature: ${rawBody}`);
     }
 
     const body = JSON.parse(rawBody.toString());
