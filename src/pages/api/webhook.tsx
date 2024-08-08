@@ -23,14 +23,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // }
 
     const body = JSON.parse(rawBody.toString());
-    const { externalUserId, reviewResult } = body;
+    const { reviewResult } = body;
+    const externalUserId = 'nathanliow7456@gmail.com'
 
     if (!externalUserId || !reviewResult) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
     const reviewAnswer = reviewResult.reviewAnswer;
-    const moderationComment = reviewResult.moderationComment;;
+    let moderationComment = '';
 
     let newKycStatus = "incomplete";
     if (reviewAnswer === 'GREEN') {
@@ -41,11 +42,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         } else if (reviewResult.reviewRejectType == "FINAL") {
             newKycStatus = 'finalReject';
         }
+        moderationComment = reviewResult.moderationComment;
     }
     
     // update user kycStatus
     try {
-        await updateKycStatus(externalUserId, newKycStatus);
+        await updateKycStatus(externalUserId, newKycStatus, moderationComment);
         res.status(200).json({ message: 'KYC status updated successfully' });
     } catch (error) {
         console.error('Error updating KYC status:', error);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
 import { getAuth } from 'firebase/auth';
-import { updateKycStatus, getKycStatus } from '@/firebase';
+import { updateKycStatus, getUserData } from '@/firebase';
 
 // icons
 import Loading from "@/components/Loading";
@@ -22,6 +22,7 @@ const Kyc = () => {
     const [provideIdDocument, setProvideIdDocument] = useState(false);
     const [provideSelfie, setProvideSelfie] = useState(false);
     const [kycStatus, setKycStatus] = useState('');
+    const [moderationComment, setModerationComment] = useState('');
 
     const handleNext = () => {
         setCurrentStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
@@ -226,7 +227,7 @@ const Kyc = () => {
                         }
         
                         // update kycStatus to pending
-                        await updateKycStatus(user.email, "pending");
+                        await updateKycStatus(user.email, "pending", '');
                     } catch (error) {
                         console.error(error);
                     }
@@ -244,8 +245,13 @@ const Kyc = () => {
             const auth = getAuth();
             const user = auth.currentUser;
             if (user && user.email) {
-                const kycStatus = await getKycStatus(user.email);
-                setKycStatus(kycStatus);
+                // get moderation comment and update page
+                const userData = await getUserData(user.email);
+
+                if (userData) {
+                    setKycStatus(userData.kycStatus);
+                    setModerationComment(userData.moderationComment);
+                }
 
                 if (kycStatus === "pending") {
                     setCurrentStep(4);
@@ -692,7 +698,7 @@ const Kyc = () => {
             title: 'You have successfully verified',
             content: (
                 <div className="flex flex-col justify-center items-center gap-8">
-
+                    
                 </div> 
             ),
         },
@@ -700,7 +706,9 @@ const Kyc = () => {
             title: 'Please verify again',
             content: (
                 <div className="flex flex-col justify-center items-center gap-8">
-
+                    <div className="text-black text-md font-bold w-3/4">
+                        {moderationComment}
+                    </div>
                 </div> 
             ),
         },
@@ -708,7 +716,9 @@ const Kyc = () => {
             title: 'You have been rejected',
             content: (
                 <div className="flex flex-col justify-center items-center gap-8">
-
+                    <div className="text-black text-md font-bold w-3/4">
+                        {moderationComment}
+                    </div>
                 </div> 
             ),
         },  
