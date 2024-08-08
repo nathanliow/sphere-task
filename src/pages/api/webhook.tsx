@@ -1,6 +1,6 @@
 import { buffer } from 'micro'
+import getRawBody from 'raw-body'
 import { NextApiRequest, NextApiResponse } from 'next';
-import { headers } from "next/headers"
 import crypto from 'crypto';
 import { updateKycStatus } from '@/firebase';
 
@@ -10,12 +10,10 @@ export const config = {
   },
 };
 
-export default async function handler(req: Request, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    // const rawBody = await buffer(req);
-    // const sig = req.headers['x-payload-digest'];
-    const rawBody = await req.text()
-    const sig = headers().get("x-payload-digest")
+    const rawBody = await getRawBody(req)
+    const sig = req.headers['x-payload-digest'];
 
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
 
