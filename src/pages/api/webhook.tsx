@@ -2,7 +2,6 @@ import { buffer } from 'micro'
 import { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
 import { updateKycStatus } from '@/firebase';
-import type { Readable } from 'node:stream';
 
 export const config = {
   api: {
@@ -13,13 +12,33 @@ export const config = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     // const rawBody = await buffer(req);
-    const rawBody = await getRawBody(req);
+    const buf = await buffer(req);
+    const rawBody = buf.toString('utf8');
     const sig = req.headers['x-payload-digest'];
+    const algo = req.headers['X-Payload-Digest-Alg'];
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
-    const calculatedDigest = crypto.createHmac('sha256', secretKey).update(rawBody);
 
-    if (calculatedDigest.digest('hex') !== sig) {
-      return res.status(400).send(`Invalid signature: ${calculatedDigest} !== ${sig}`);
+    let algorithm: string;
+    switch (algo) {
+        case 'HMAC_SHA1_HEX':
+            algorithm = 'sha1';
+            break;
+        case 'HMAC_SHA256_HEX':
+            algorithm = 'sha256';
+            break;
+        case 'HMAC_SHA512_HEX':
+            algorithm = 'sha512';
+            break;
+        default:
+            return res.status(400).send('Unsupported HMAC algorithm');
+    }
+
+    const calculatedDigest = crypto.createHmac(algorithm, secretKey)
+        .update(rawBody)
+        .digest('hex');
+
+    if (calculatedDigest !== sig) {
+      return res.status(400).send(`Invalid signature: ${algorithm} | ${calculatedDigest} !== ${sig}`);
     }
 
     const body = JSON.parse(rawBody.toString());
@@ -58,11 +77,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(405).end(`Method Not Allowed`);
   }
 }
-
-async function getRawBody(readable: Readable): Promise<Buffer> {
-    const chunks = [];
-    for await (const chunk of readable) {
-      chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-    }
-    return Buffer.concat(chunks);
-  }
