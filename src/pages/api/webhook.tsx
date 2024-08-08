@@ -15,30 +15,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const buf = await buffer(req);
     const rawBody = buf.toString('utf8');
     const sig = req.headers['x-payload-digest'];
-    // const algo = req.headers['X-Payload-Digest-Alg'];
+    const algo = req.headers['x-payload-digest-alg'];
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
 
     let algorithm: string;
-    // switch (algo) {
-    //     case 'HMAC_SHA1_HEX':
-    //         algorithm = 'sha1';
-    //         break;
-    //     case 'HMAC_SHA256_HEX':
-    //         algorithm = 'sha256';
-    //         break;
-    //     case 'HMAC_SHA512_HEX':
-    //         algorithm = 'sha512';
-    //         break;
-    //     default:
-    //         return res.status(400).send('Unsupported HMAC algorithm');
-    // }
+    switch (algo) {
+        case 'HMAC_SHA1_HEX':
+            algorithm = 'sha1';
+            break;
+        case 'HMAC_SHA256_HEX':
+            algorithm = 'sha256';
+            break;
+        case 'HMAC_SHA512_HEX':
+            algorithm = 'sha512';
+            break;
+        default:
+            return res.status(400).send('Unsupported HMAC algorithm');
+    }
 
-    const calculatedDigest = crypto.createHmac('sha256', secretKey)
+    const calculatedDigest = crypto.createHmac(algorithm, secretKey)
         .update(rawBody)
         .digest('hex');
 
     if (calculatedDigest !== sig) {
-      return res.status(400).send(`Invalid signature: ${calculatedDigest} !== ${sig}`);
+      return res.status(400).send(`Invalid signature: ${algorithm} ${calculatedDigest} !== ${sig}\n ${rawBody}`);
     }
 
     const body = JSON.parse(rawBody.toString());
