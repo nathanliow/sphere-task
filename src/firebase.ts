@@ -90,7 +90,7 @@ export async function updateTos(email: string) {
     }
 }
 
-export async function updateKycStatus(email: string, status: string, moderationComment: string) {
+export async function updateKycStatus(email: string, status: string, reviewResult: any) {
     try {
         const usersRef = collection(firestore, 'users');
         const q = query(usersRef, where('email', '==', email));
@@ -106,7 +106,7 @@ export async function updateKycStatus(email: string, status: string, moderationC
         
         await updateDoc(userDocRef, {
             kycStatus: status,
-            moderationComment: moderationComment,
+            reviewResult: reviewResult,
         });
 
         return true;
@@ -129,7 +129,7 @@ export async function getUserData(email: string) {
         const userDoc = querySnapshot.docs[0];
         return {
             kycStatus: userDoc.data().kycStatus,
-            moderationComment: userDoc.data().moderationComment,
+            reviewResult: userDoc.data().reviewResult,
         }
         
     } catch (error) {

@@ -31,9 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const reviewAnswer = reviewResult.reviewAnswer;
-    let moderationComment = '';
 
-    let newKycStatus = "incomplete";
+    let newKycStatus = "pending";
     if (reviewAnswer === 'GREEN') {
         newKycStatus = 'approved';
     } else {
@@ -42,12 +41,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         } else if (reviewResult.reviewRejectType == "FINAL") {
             newKycStatus = 'finalReject';
         }
-        moderationComment = reviewResult.moderationComment;
     }
     
     // update user kycStatus
     try {
-        await updateKycStatus(externalUserId, newKycStatus, moderationComment);
+        await updateKycStatus(externalUserId, newKycStatus, reviewResult);
         res.status(200).json({ message: 'KYC status updated successfully' });
     } catch (error) {
         console.error('Error updating KYC status:', error);

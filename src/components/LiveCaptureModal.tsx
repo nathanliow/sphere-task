@@ -73,10 +73,20 @@ const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, documentT
                 }
                 {(state.step === 'front' && state.frontImageSrc) || (state.step === 'back' && state.backImageSrc) ? (
                     state.step === 'front' && state.frontImageSrc ? (
-                        <Image src={state.frontImageSrc} alt="Captured front" className="" />
+                        <Image 
+                            src={state.frontImageSrc} 
+                            alt="Captured front" 
+                            width={1280} 
+                            height={720} 
+                            className="" />
                     ) : (
                         state.step === 'back' && state.backImageSrc && (
-                            <Image src={state.backImageSrc} alt="Captured back" className="" />
+                            <Image 
+                                src={state.backImageSrc} 
+                                alt="Captured back" 
+                                width={1280} 
+                                height={720} 
+                                className="" />
                         )
                     )
                 ) : (

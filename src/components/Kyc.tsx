@@ -5,6 +5,7 @@ import { updateKycStatus, getUserData } from '@/firebase';
 
 // icons
 import Loading from "@/components/Loading";
+import Sphere from '@/components/Sphere';
 import { HiOutlineIdentification } from "react-icons/hi2";
 import { CiCamera } from "react-icons/ci";
 import { FaChevronLeft } from 'react-icons/fa';
@@ -30,6 +31,10 @@ const Kyc = () => {
 
     const handlePrev = () => {
         setCurrentStep((prevStep) => Math.max(prevStep - 1, 0));
+    };
+
+    const handleRetry = () => {
+        setCurrentStep(1);
     };
 
     const handleOpenModal = () => {
@@ -82,7 +87,7 @@ const Kyc = () => {
                                 country: country,
                             }),
                         });
-            
+                        
                         if (!response.ok) {
                             throw new Error('Failed to add front side document');
                         }
@@ -245,21 +250,22 @@ const Kyc = () => {
             const auth = getAuth();
             const user = auth.currentUser;
             if (user && user.email) {
-                // get moderation comment and update page
                 const userData = await getUserData(user.email);
 
                 if (userData) {
                     setKycStatus(userData.kycStatus);
-                    setModerationComment(userData.moderationComment);
+                    setModerationComment(userData.reviewResult.moderationComment);
+                } else {
+                    return;
                 }
 
-                if (kycStatus === "pending") {
+                if (userData.kycStatus === "pending") {
                     setCurrentStep(4);
-                } else if (kycStatus === "approved") {
+                } else if (userData.kycStatus === "approved") {
                     setCurrentStep(5);
-                } else if (kycStatus === "tempReject") {
+                } else if (userData.kycStatus === "tempReject") {
                     setCurrentStep(6);
-                } else if (kycStatus === "finalReject") {
+                } else if (userData.kycStatus === "finalReject") {
                     setCurrentStep(7);
                 }
             }
@@ -681,6 +687,11 @@ const Kyc = () => {
                 <div className="flex flex-col justify-center items-center gap-8">
                      <Loading size={40}/>
 
+                    <div className="text-black text-md w-3/4">
+                        This process typically takes 3 to 5 minutes but may take up to 24 hours.
+                        Refresh the page to check.
+                    </div>
+
                     <div className="flex flex-col gap-2">
                         <div className="flex flex-hor gap-4">
                             <IoCheckmarkCircleOutline size={24} color={'lime'}/>
@@ -695,20 +706,26 @@ const Kyc = () => {
             ),
         },
         {
-            title: 'You have successfully verified',
+            title: 'You have been successfully verified',
             content: (
                 <div className="flex flex-col justify-center items-center gap-8">
-                    
+                    <Sphere/>
                 </div> 
             ),
         },
         {
-            title: 'Please verify again',
+            title: 'You have been rejected. Please verify again',
             content: (
                 <div className="flex flex-col justify-center items-center gap-8">
-                    <div className="text-black text-md font-bold w-3/4">
+                    <div className="text-black text-md w-3/4">
                         {moderationComment}
                     </div>
+                    <Button 
+                        variant="secondary" 
+                        onClick={handleRetry}    
+                    >
+                        Continue
+                    </Button>
                 </div> 
             ),
         },
@@ -716,7 +733,7 @@ const Kyc = () => {
             title: 'You have been rejected',
             content: (
                 <div className="flex flex-col justify-center items-center gap-8">
-                    <div className="text-black text-md font-bold w-3/4">
+                    <div className="text-black text-md w-3/4">
                         {moderationComment}
                     </div>
                 </div> 
@@ -738,7 +755,7 @@ const Kyc = () => {
                 <div className="text-black text-xl font-bold">{steps[currentStep].title}</div>
                 <div>{steps[currentStep].content}</div>
 
-                {currentStep < 4 && (<div className="flex flex-col justify-center w-1/2">
+                {(currentStep < 4) && (<div className="flex flex-col justify-center w-1/2">
                     <Button 
                         variant="secondary" 
                         onClick={handleNext} 
