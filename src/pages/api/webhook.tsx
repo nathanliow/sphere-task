@@ -11,7 +11,7 @@ export const config = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const rawBody = await buffer(req.body);
+    const rawBody = await buffer(req);
     const sigHeader = req.headers['x-payload-digest'];
     const sig = (Array.isArray(sigHeader) ? sigHeader[0] : sigHeader) || '';
     const secretKey = process.env.SUMSUB_WEBHOOK_SECRET_KEY || '';
@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .update(rawBody)
         .digest('hex');
 
-    if (!verifySignature(rawBody, sig, secretKey)) {
+    if (calculatedDigest !== sig) {
         return res.status(400).send(`Invalid signature`);
     }
 
@@ -59,10 +59,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(405).end(`Method Not Allowed`);
   }
 }
-
-export const verifySignature = (rawBody: Buffer, signature: string, secret: string): boolean => {
-    const hmac = crypto.createHmac('sha256', secret);
-    const digest = Buffer.from(hmac.update(rawBody).digest('hex'), 'utf8');
-    const receivedSignature = Buffer.from(signature, 'utf8');
-   return crypto.timingSafeEqual(digest, receivedSignature);
-};
