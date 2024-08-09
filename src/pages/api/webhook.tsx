@@ -18,13 +18,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .update(rawBody)
         .digest('hex');
 
-    if (calculatedDigest !== sig) {
-        return res.status(400).send(`Invalid signature`);
-    }
-
     const body = JSON.parse(rawBody.toString());
-    const { reviewResult } = body;
-    const externalUserId = 'nathanliow7456@gmail.com'
+    const { externalUserId, reviewResult, correlationId } = body;
+
+    if (calculatedDigest !== sig) {
+      return res.status(400).send(`Invalid signature: ${correlationId}`);
+  }
 
     if (!externalUserId || !reviewResult) {
         return res.status(400).json({ error: 'Missing required fields' });
