@@ -50,8 +50,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.error('Error updating KYC status:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
-
-    res.status(200).send('Webhook received');
   } else {
     res.setHeader('Allow', 'POST');
     res.status(405).end(`Method Not Allowed`);
