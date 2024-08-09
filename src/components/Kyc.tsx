@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
 import { getAuth } from 'firebase/auth';
 import { updateKycStatus, getUserData } from '@/firebase';
+import ProgressBar from '@/components/ProgressBar';
+import LiveCaptureModal from '@/components/LiveCaptureModal';
 
 // icons
 import Loading from "@/components/Loading";
@@ -12,7 +14,6 @@ import { FaChevronLeft } from 'react-icons/fa';
 import { IoCheckmarkCircleOutline } from "react-icons/io5";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import { MdOutlineFileUpload } from "react-icons/md";
-import LiveCaptureModal from '@/components/LiveCaptureModal';
 
 const Kyc = () => {
     const stepNames = [
@@ -757,7 +758,9 @@ const Kyc = () => {
 
     return (
         <div className="w-full h-full">
-            {/* progress bars */}
+            <div className="p-4">
+                <ProgressBar currentStep={currentStep} />
+            </div>
 
             <div className="flex flex-col relative items-center border-2 border-gray p-8 rounded-[20px] gap-10">
                 {stepNames.indexOf(currentStep) > 0 && stepNames.indexOf(currentStep) < 4 && (
