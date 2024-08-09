@@ -15,7 +15,17 @@ import { MdOutlineFileUpload } from "react-icons/md";
 import LiveCaptureModal from '@/components/LiveCaptureModal';
 
 const Kyc = () => {
-    const [currentStep, setCurrentStep] = useState(0);
+    const stepNames = [
+        "INTRODUCTION",
+        "SELECT_DOCUMENT",
+        "UPLOAD_DOCUMENT",
+        "UPLOAD_SELFIE",
+        "PROCESSING",
+        "VERIFIED",
+        "TEMP_REJECT",
+        "FINAL_REJECT"
+    ]
+    const [currentStep, setCurrentStep] = useState(stepNames[0]);
     const [webcamActive, setWebcamActive] = useState(false);
     const [country, setCountry] = useState('');
     const [savedDocumentType, setSavedDocumentType] = useState('');
@@ -26,15 +36,19 @@ const Kyc = () => {
     const [moderationComment, setModerationComment] = useState('');
 
     const handleNext = () => {
-        setCurrentStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
+        const currentIndex = stepNames.indexOf(currentStep);
+        const nextIndex = Math.min(currentIndex + 1, stepNames.length - 1);
+        setCurrentStep(stepNames[nextIndex]);
     };
 
     const handlePrev = () => {
-        setCurrentStep((prevStep) => Math.max(prevStep - 1, 0));
+        const currentIndex = stepNames.indexOf(currentStep);
+        const prevIndex = Math.max(currentIndex - 1, 0);
+        setCurrentStep(stepNames[prevIndex]);
     };
 
     const handleRetry = () => {
-        setCurrentStep(1);
+        setCurrentStep('SELECT_DOCUMENT');
     };
 
     const handleOpenModal = () => {
@@ -60,7 +74,7 @@ const Kyc = () => {
                 return;
             }
 
-            const addDocType = currentStep == 2 ? documentType : 'SELFIE';
+            const addDocType = currentStep === 'UPLOAD_DOCUMENT' ? documentType : 'SELFIE';
 
             if (addDocType != 'SELFIE') {
                 if (!frontImageSrc || !backImageSrc) {
@@ -199,13 +213,13 @@ const Kyc = () => {
     };
 
     useEffect(() => {
-        if (currentStep === 3) {
+        if (currentStep === 'UPLOAD_SELFIE') {
             setDocumentType('SELFIE');
-        } else if (currentStep === 2) {
+        } else if (currentStep === 'UPLOAD_DOCUMENT') {
             setDocumentType(savedDocumentType);
         }
 
-        if (currentStep == 4 && kycStatus == "incomplete") {
+        if (currentStep === 'PROCESSING' && kycStatus === "incomplete") {
             const handleRequestApplicantCheck = async () => {
                 try {
                     const auth = getAuth();
@@ -260,13 +274,13 @@ const Kyc = () => {
                 }
 
                 if (userData.kycStatus === "pending") {
-                    setCurrentStep(4);
+                    setCurrentStep('PROCESSING');
                 } else if (userData.kycStatus === "approved") {
-                    setCurrentStep(5);
+                    setCurrentStep('VERIFIED');
                 } else if (userData.kycStatus === "tempReject") {
-                    setCurrentStep(6);
+                    setCurrentStep('TEMP_REJECT');
                 } else if (userData.kycStatus === "finalReject") {
-                    setCurrentStep(7);
+                    setCurrentStep('FINAL_REJECT');
                 }
             }
         };
@@ -746,23 +760,23 @@ const Kyc = () => {
             {/* progress bars */}
 
             <div className="flex flex-col relative items-center border-2 border-gray p-8 rounded-[20px] gap-10">
-                {currentStep > 0 && currentStep < 4 && (
+                {stepNames.indexOf(currentStep) > 0 && stepNames.indexOf(currentStep) < 4 && (
                     <FaChevronLeft
                         onClick={handlePrev}
                         className="absolute top-8 left-8 text-xl cursor-pointer"
                     />
                 )}
-                <div className="text-black text-xl font-bold">{steps[currentStep].title}</div>
-                <div>{steps[currentStep].content}</div>
+                <div className="text-black text-xl font-bold">{steps[stepNames.indexOf(currentStep)].title}</div>
+                <div>{steps[stepNames.indexOf(currentStep)].content}</div>
 
-                {(currentStep < 4) && (<div className="flex flex-col justify-center w-1/2">
+                {(stepNames.indexOf(currentStep) < 4) && (<div className="flex flex-col justify-center w-1/2">
                     <Button 
                         variant="secondary" 
                         onClick={handleNext} 
                         disabled={
-                            (currentStep === 1 && (!country || !documentType)) ||
-                            (currentStep === 2 && !provideIdDocument) ||
-                            (currentStep === 3 && !provideSelfie)
+                            (currentStep === 'SELECT_DOCUMENT' && (!country || !documentType)) ||
+                            (currentStep === 'UPLOAD_DOCUMENT' && !provideIdDocument) ||
+                            (currentStep === 'UPLOAD_SELFIE' && !provideSelfie)
                         }    
                     >
                         Continue
@@ -778,7 +792,6 @@ const Kyc = () => {
 
             </div>
         </div>
-        
     );
 };
 
