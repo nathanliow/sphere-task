@@ -83,13 +83,15 @@ const Kyc = () => {
                     return;
                 }
 
-                setProvideIdDocument(true);
                 setWebcamActive(false);
 
                 // add id documents
                 try {
+                    let frontResponse;
+                    let backResponse;
+
                     if (frontImageSrc) {
-                        const response = await fetch('/api/addDocument', {
+                        frontResponse = await fetch('/api/addDocument', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -103,13 +105,13 @@ const Kyc = () => {
                             }),
                         });
                         
-                        if (!response.ok) {
+                        if (!frontResponse.ok) {
                             throw new Error('Failed to add front side document');
                         }
                     }
     
                     if (backImageSrc) {
-                        const response = await fetch('/api/addDocument', {
+                        backResponse = await fetch('/api/addDocument', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -123,11 +125,14 @@ const Kyc = () => {
                             }),
                         });
             
-                        if (!response.ok) {
+                        if (!backResponse.ok) {
                             throw new Error('Failed to add back side document');
                         }
                     }
-                    
+
+                    if (frontResponse && backResponse && frontResponse.ok && backResponse.ok) {
+                        setProvideIdDocument(true);
+                    }
                 } catch (error) {
                     console.error(error);
                 }
@@ -137,7 +142,6 @@ const Kyc = () => {
                     return;
                 }
 
-                setProvideSelfie(true);
                 setWebcamActive(false);
 
                 // add selfie document
@@ -160,6 +164,8 @@ const Kyc = () => {
                         if (!response.ok) {
                             throw new Error('Failed to add selfie document');
                         }
+
+                        setProvideSelfie(true);
                     }
                 } catch (error) {
                     console.error(error);
