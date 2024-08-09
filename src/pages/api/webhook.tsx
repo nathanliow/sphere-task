@@ -18,9 +18,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .update(rawBody)
         .digest('hex');
 
-    // if (calculatedDigest !== sig) {
-    //     return res.status(400).send(`Invalid signature`);
-    // }
+    if (calculatedDigest !== sig) {
+        return res.status(400).send(`Invalid signature`);
+    }
 
     const body = JSON.parse(rawBody.toString());
     const { reviewResult } = body;
