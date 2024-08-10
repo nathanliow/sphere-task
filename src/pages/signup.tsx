@@ -50,7 +50,7 @@ export default function Signup() {
         
         router.push("/");
       } catch (error: any) {
-        setError("Error signing up");
+        setError("There was an error signing up, please try again");
       }
     };
 

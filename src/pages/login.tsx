@@ -67,7 +67,7 @@ export default function Login() {
         }
         
       } catch (error: any) {
-        setError(error.message);
+        setError("There was an error, please try again");
         return;
       }
     };

@@ -4,6 +4,7 @@ import { getAuth } from 'firebase/auth';
 import { updateKycStatus, getUserData } from '@/firebase';
 import ProgressBar from '@/components/ProgressBar';
 import LiveCaptureModal from '@/components/LiveCaptureModal';
+import Toast from '@/components/Toast';
 
 // icons
 import Loading from "@/components/Loading";
@@ -14,6 +15,8 @@ import { FaChevronLeft } from 'react-icons/fa';
 import { IoCheckmarkCircleOutline } from "react-icons/io5";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import { MdOutlineFileUpload } from "react-icons/md";
+import { AiOutlineExclamationCircle } from "react-icons/ai";
+
 
 const Kyc = () => {
     const stepNames = [
@@ -35,6 +38,7 @@ const Kyc = () => {
     const [provideSelfie, setProvideSelfie] = useState(false);
     const [kycStatus, setKycStatus] = useState('');
     const [moderationComment, setModerationComment] = useState('');
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     const handleNext = () => {
         const currentIndex = stepNames.indexOf(currentStep);
@@ -78,8 +82,8 @@ const Kyc = () => {
             const addDocType = currentStep === 'UPLOAD_DOCUMENT' ? documentType : 'SELFIE';
 
             if (addDocType != 'SELFIE') {
-                if (!frontImageSrc || !backImageSrc) {
-                    console.error(`frontImageSrc or backImageSrc null`);
+                if (!frontImageSrc && !backImageSrc) {
+                    console.error(`frontImageSrc and backImageSrc null`);
                     return;
                 }
 
@@ -106,7 +110,7 @@ const Kyc = () => {
                         });
                         
                         if (!frontResponse.ok) {
-                            throw new Error('Failed to add front side document');
+                            setErrorMsg('Failed to upload document, please try again.');
                         }
                     }
     
@@ -126,14 +130,17 @@ const Kyc = () => {
                         });
             
                         if (!backResponse.ok) {
-                            throw new Error('Failed to add back side document');
+                            setErrorMsg('Failed to upload document, please try again.');
                         }
                     }
 
                     if (frontResponse && backResponse && frontResponse.ok && backResponse.ok) {
                         setProvideIdDocument(true);
-                    }
+                    } else if (frontResponse && frontResponse.ok) {
+                        setProvideIdDocument(true);
+                    } 
                 } catch (error) {
+                    setErrorMsg(`${error}`);
                     console.error(error);
                 }
             } else {
@@ -162,62 +169,140 @@ const Kyc = () => {
                         });
             
                         if (!response.ok) {
-                            throw new Error('Failed to add selfie document');
+                            setErrorMsg('Failed to upload selfie, please try again.');
                         }
 
                         setProvideSelfie(true);
                     }
                 } catch (error) {
+                    setErrorMsg(`${error}`);
                     console.error(error);
                 }
             }
         } catch (error) {
+            setErrorMsg(`${error}`);
             console.error(error);
         }
     };
 
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
+        const files = event.target.files;
+        if (!files) {
+            console.error('No file uploaded');
+            return;
+        }
+    
         const auth = getAuth();
         const user = auth.currentUser;
-
+    
         if (!user || !user.email) {
             console.error(`User not authenticated or doesn't have email`);
             return;
         }
-
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            const imageSrc = reader.result as string;
-
-            setProvideIdDocument(true);
+    
+        const readFile = (file: File): Promise<string> => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result as string);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        };
+    
+        try {
             setWebcamActive(false);
 
-            try {
-                const response = await fetch('/api/addDocument', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        userId: user.email, 
-                        documentImage: imageSrc, 
-                        documentType: documentType,
-                        country: country,
-                    }),
-                });
+            if (files.length === 1) {
+                let response;
 
-                if (!response.ok) {
-                    throw new Error('Failed to add document');
+                const imageSrc = await readFile(files[0]);
+
+                if (imageSrc) {
+                    response = await fetch('/api/addDocument', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            userId: user.email, 
+                            documentImage: imageSrc,
+                            documentType: documentType,
+                            documentSide: 'null',
+                            country: country,
+                        }),
+                    });
+    
+                    if (!response.ok) {
+                        setErrorMsg('Failed to upload file, please try again');
+                        console.log(response)
+                    }
                 }
-            } catch (error) {
-                console.error(error);
+
+                if (response && response.ok) {
+                    setProvideIdDocument(true);
+                }
+            } else {
+                let frontResponse;
+                let backResponse;
+
+                const frontImageSrc = await readFile(files[0]);
+                const backImageSrc = await readFile(files[1]);
+                
+                if (frontImageSrc) {
+                    frontResponse = await fetch('/api/addDocument', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            userId: user.email, 
+                            documentImage: frontImageSrc,
+                            documentType: documentType,
+                            documentSide: 'FRONT_SIDE',
+                            country: country,
+                        }),
+                    });
+
+                    if (!frontResponse.ok) {
+                        setErrorMsg('Failed to upload front side file, please try again');
+                    }
+                }
+
+                if (backImageSrc) {
+                    backResponse = await fetch('/api/addDocument', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            userId: user.email, 
+                            documentImage: backImageSrc,
+                            documentType: documentType,
+                            documentSide: 'BACK_SIDE',
+                            country: country,
+                        }),
+                    });
+
+                    if (!backResponse.ok) {
+                        setErrorMsg('Failed to upload back side file, please try again.');
+                    }
+                }
+
+                if (frontResponse && backResponse && frontResponse.ok && backResponse.ok) {
+                    setProvideIdDocument(true);
+                }
             }
-        };
-        reader.readAsDataURL(file);
+        } catch (error) {
+            setErrorMsg(`${error}`);
+            console.error(error);
+        } finally {
+            event.target.value = '';
+        }
     };
+
+    const handleCloseToast = () => {
+        setErrorMsg(null);
+      };
 
     useEffect(() => {
         if (currentStep === 'UPLOAD_SELFIE') {
@@ -249,15 +334,17 @@ const Kyc = () => {
                         });
             
                         if (!response.ok) {
-                            throw new Error('Failed to request applicant check');
+                            setErrorMsg('Failed to request applicant check');
                         }
         
                         // update kycStatus to pending
                         await updateKycStatus(user.email, "pending", '');
                     } catch (error) {
+                        setErrorMsg(`${error}`);
                         console.error(error);
                     }
                 } catch (error) {
+                    setErrorMsg(`${error}`);
                     console.error(error);
                 }
             };
@@ -275,7 +362,10 @@ const Kyc = () => {
 
                 if (userData) {
                     setKycStatus(userData.kycStatus);
-                    setModerationComment(userData.reviewResult.moderationComment);
+
+                    if (userData.reviewResult && userData.reviewResult.moderationComment) {
+                        setModerationComment(userData.reviewResult.moderationComment);
+                    }
                 } else {
                     return;
                 }
@@ -652,6 +742,7 @@ const Kyc = () => {
                                         onChange={handleFileUpload}
                                         className="hidden"
                                         id="file-upload"
+                                        multiple
                                     />
                             </div>
                         </label>
@@ -671,6 +762,11 @@ const Kyc = () => {
                             <IoCloseCircleOutline size={24} color={'red'}/>
                             <div className="text-black text-md">{`Don't edit images of your document`}</div>
                         </div>
+                        <div className="flex flex-hor gap-4">
+                            <AiOutlineExclamationCircle size={24} color={'orange'}/>
+                            <div className="text-black text-md">{`If uploading a document with two sides, upload the front side first.`}</div>
+                        </div>
+                        
                     </div>
                 </div>     
             ),
@@ -799,6 +895,7 @@ const Kyc = () => {
                     onCancel={() => setWebcamActive(false)}
                 />
 
+                {errorMsg && <Toast message={errorMsg} onClose={handleCloseToast} />}
             </div>
         </div>
     );

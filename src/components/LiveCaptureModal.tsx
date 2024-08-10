@@ -117,6 +117,9 @@ const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, documentT
                             <Button variant="primary" onClick={handleNextStep}>
                                 {state.step === 'front' ? 'Next: Capture Back' : 'Use photos'}
                             </Button>
+                            {state.step === 'front' && <Button variant="primary" onClick={handleUsePhoto}>
+                                {'Finish'}
+                            </Button>}
                         </>
                     ) : (
                         <>
