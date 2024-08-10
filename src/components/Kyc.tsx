@@ -871,7 +871,7 @@ const Kyc = () => {
                         className="absolute top-8 left-8 text-xl cursor-pointer"
                     />
                 )}
-                <div className="text-black text-xl font-bold">{steps[stepNames.indexOf(currentStep)].title}</div>
+                <div className="text-black text-xl font-bold px-8">{steps[stepNames.indexOf(currentStep)].title}</div>
                 <div>{steps[stepNames.indexOf(currentStep)].content}</div>
 
                 {(stepNames.indexOf(currentStep) < 4) && (<div className="flex flex-col justify-center w-1/2">
