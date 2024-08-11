@@ -12,46 +12,49 @@ export default function Signup() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     const handleSignUp = async (e: any) => {
-      e.preventDefault();
-      try {
-        if (password.length < 6) {
-          setError("Password must be at least 6 characters");
-          return;
+        e.preventDefault();
+        try {
+            if (password.length < 6) {
+                setError("Password must be at least 6 characters");
+                return;
+            }
+
+            if (password != confirmPassword) {
+                setError("Passwords don't match");
+                return;
+            }
+
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            const exists = await userExists(email);
+
+            if (!exists) {
+                setLoading(true);
+                await createUser(email);
+
+                if (user) {
+                    const response = await fetch('/api/createApplicant', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email }), 
+                    });
+
+                    if (response.ok) {
+                        setLoading(false);
+                        router.push("/");
+                    }
+                }
+            }        
+        } catch (error: any) {
+            setError("There was an error signing up, please try again");
         }
-
-        if (password != confirmPassword) {
-          setError("Passwords don't match");
-          return;
-        }
-
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        const exists = await userExists(email);
-
-        if (!exists) {
-          await createUser(email);
-
-          if (user) {
-            const response = await fetch('/api/createApplicant', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ email: email }), 
-            });
-
-            const data = await response.json();
-          }
-        }
-        
-        router.push("/");
-      } catch (error: any) {
-        setError("There was an error signing up, please try again");
-      }
     };
 
     return (
@@ -103,7 +106,7 @@ export default function Signup() {
               {error && <p className="text-red text-sm mt-2">{error}</p>}
               
               <div className="mt-6">
-                <Button variant="secondary" onClick={() => handleSignUp}>
+                <Button variant="secondary" onClick={() => handleSignUp} loading={loading}>
                   Create account
                 </Button>
               </div>

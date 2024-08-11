@@ -15,6 +15,7 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     onAuthStateChanged(auth, (user) => {
@@ -26,9 +27,11 @@ export default function Login() {
     const handleSignInEmailPassword = async (e: any) => {
       e.preventDefault();
       try {
+        setLoading(true);
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        
+
+        setLoading(false);
         router.push("/");
       } catch (error: any) {
         setError("Invalid email or password");
@@ -108,7 +111,7 @@ export default function Login() {
               {error && <p className="text-red text-sm mt-2">{error}</p>}
               
               <div className="mt-6">
-                <Button variant="secondary" onClick={handleSignInEmailPassword}>
+                <Button variant="secondary" onClick={handleSignInEmailPassword} loading={loading}>
                   Login
                 </Button>
               </div>
