@@ -351,7 +351,7 @@ const Kyc = () => {
             setDocumentType(savedDocumentType);
         }
 
-        if (currentStep === 'PROCESSING' && kycStatus === "incomplete") {
+        if (currentStep === 'PROCESSING' && (kycStatus === "incomplete" || kycStatus === "tempReject")) {
             const handleRequestApplicantCheck = async () => {
                 try {
                     const auth = getAuth();
@@ -919,9 +919,10 @@ const Kyc = () => {
                         variant="secondary" 
                         onClick={handleNext} 
                         disabled={
-                            (currentStep === 'SELECT_DOCUMENT' && (!country || !documentType)) ||
+                            loading ||
+                            ((currentStep === 'SELECT_DOCUMENT' && (!country || !documentType)) ||
                             (currentStep === 'UPLOAD_DOCUMENT' && !provideIdDocument) ||
-                            (currentStep === 'UPLOAD_SELFIE' && !provideSelfie)
+                            (currentStep === 'UPLOAD_SELFIE' && !provideSelfie))
                         } 
                         loading={loading}
                     >

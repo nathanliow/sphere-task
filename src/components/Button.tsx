@@ -38,11 +38,7 @@ const Button: React.FC<ButtonProps> = ({ variant, onClick, children, disabled = 
     <button className={className} onClick={onClick} disabled={disabled}>
       {loading ? (
         <div className="flex items-center justify-center max-h-[24px]">
-          {disabled ? (
-            <Loading size={80}/>
-          ) : (
-            <Loading size={80} color="#FFFFFF"/>
-          )}
+          <Loading size={80}/>
         </div>
       ) : (
         children
