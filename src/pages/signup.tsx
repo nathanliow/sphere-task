@@ -52,7 +52,8 @@ export default function Signup() {
                     }
                 }
             }        
-        } catch (error: any) {
+        } catch (error) {
+            setLoading(false);
             setError("There was an error signing up, please try again");
         }
     };

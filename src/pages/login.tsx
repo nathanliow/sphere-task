@@ -34,6 +34,7 @@ export default function Login() {
         setLoading(false);
         router.push("/");
       } catch (error: any) {
+        setLoading(false);
         setError("Invalid email or password");
         return;
       }
