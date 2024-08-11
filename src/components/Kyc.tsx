@@ -114,8 +114,9 @@ const Kyc = () => {
                             });
                             
                             if (!frontResponse.ok) {
-                                setErrorMsg('Failed to upload document, please try again.');
+                                setErrorMsg('Failed to upload front side document, please try again.');
                                 setLoading(false);
+                                return;
                             }
                         }
         
@@ -135,8 +136,9 @@ const Kyc = () => {
                             });
                 
                             if (!backResponse.ok) {
-                                setErrorMsg('Failed to upload document, please try again.');
+                                setErrorMsg('Failed to upload back side document, please try again.');
                                 setLoading(false);
+                                return;
                             }
                         }
 

@@ -51,9 +51,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
 
     const rawData = await response.text();
+    const data = JSON.parse(rawData);
     if (!response.ok) {
         return res.status(response.status).json({ error: 'API call failed', details: rawData });
     }
-    const data = JSON.parse(rawData);
-    res.status(200).json(data); 
+    if (data.errors) {
+        res.status(409).json(data); 
+    } else {
+        res.status(200).json(data); 
+    }
 }
