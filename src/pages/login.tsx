@@ -111,7 +111,7 @@ export default function Login() {
               {error && <p className="text-red text-sm mt-2">{error}</p>}
               
               <div className="mt-6">
-                <Button variant="secondary" onClick={handleSignInEmailPassword} loading={loading}>
+                <Button variant="secondary" onClick={handleSignInEmailPassword} disabled={loading} loading={loading}>
                   Login
                 </Button>
               </div>

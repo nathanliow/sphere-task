@@ -106,7 +106,7 @@ export default function Signup() {
               {error && <p className="text-red text-sm mt-2">{error}</p>}
               
               <div className="mt-6">
-                <Button variant="secondary" onClick={() => handleSignUp} loading={loading}>
+                <Button variant="secondary" onClick={() => handleSignUp} disabled={loading} loading={loading}>
                   Create account
                 </Button>
               </div>
