@@ -29,9 +29,9 @@ const TosModal: React.FC<ModalProps> = ({ isOpen, onClose, onAccept }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white flex flex-col rounded-lg w-3/4 h-3/4 max-w-3xl p-6">
+      <div className="bg-white flex flex-col rounded-lg w-5/6 h-3/4 max-w-3xl p-6">
         <h2 className="text-xl font-bold mb-4">Accept Terms of Service</h2>
-        <div className="h-full overflow-y-auto border border-dark-gray rounded-md p-4 mb-4">
+        <div className="h-full overflow-y-auto border border-dark-gray rounded-md p-2 mb-4">
           <div dangerouslySetInnerHTML={{ __html: terms }} />
         </div>
         <div className="flex justify-center gap-12">

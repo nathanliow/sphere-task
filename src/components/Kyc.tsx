@@ -432,7 +432,7 @@ const Kyc = () => {
             title: 'Verification for Sphere Labs',
             content: (
                 <div className="flex flex-col justify-center items-center gap-8">
-                    <div className="text-black text-md font-bold w-3/4">
+                    <div className="text-black text-md font-bold w-full md:w-3/4">
                         You’re about to submit sensitive data to Sphere Labs. 
                         If you received this link from a suspicious source, 
                         please close this page and notify us immediately.
@@ -464,8 +464,8 @@ const Kyc = () => {
         {
             title: 'Select type and issuing country of your identity document',
             content: (
-                <div className="flex flex-col justify-center items-left gap-8">
-                    <div className="flex flex-col gap-2">
+                <div className="flex flex-col justify-center items-center gap-6">
+                    <div className="flex flex-col gap-2 w-3/4 md:w-full">
                         <label htmlFor="country-select" className="text-black text-md font-bold">Issuing Country</label>
                         <select id="country-select" value={country} onChange={handleCountryChange} className="bg-light-gray p-2 rounded-[10px]">
                             <option value="">Select a country</option>
@@ -701,7 +701,7 @@ const Kyc = () => {
                         </select>
                     </div>
 
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 w-3/4 md:w-full">
                         <label className="text-black text-md font-bold">Document Type</label>
                         <div className="flex flex-col gap-2">
                             <label className="flex items-center justify-between gap-2 cursor-pointer bg-light-gray rounded-[10px] px-4 py-2">                              
@@ -769,7 +769,7 @@ const Kyc = () => {
             title: 'Provide your identity document',
             content: (
                 <div className="flex flex-col justify-center items-center gap-6">
-                    <div className="flex  gap-6">
+                    <div className="flex gap-6">
                         <div className="flex flex-col items-center border-2 border-gray p-4 md:p-12 rounded-[20px] cursor-pointer hover:bg-hover-white" onClick={handleOpenModal}>
                             <CiCamera size={40} />
                             <div className="text-black text-sm font-bold text-center">Take a photo</div>
@@ -790,23 +790,23 @@ const Kyc = () => {
                         </label>
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                        <div className="text-black text-md font-bold">Tips</div>
-                        <div className="flex  gap-4">
+                    <div className="flex flex-col gap-2 text-sm md:text-md text-black">
+                        <div className="font-bold">Tips</div>
+                        <div className="flex gap-4">
                             <IoCheckmarkCircleOutline className="min-h-6 min-w-6 h-6 w-6" color={'lime'}/>
-                            <div className="text-black text-md">Upload a colored photo or file</div>
+                            <div className="">Upload a colored photo or file</div>
                         </div>
-                        <div className="flex  gap-4">
+                        <div className="flex gap-4">
                             <IoCheckmarkCircleOutline className="min-h-6 min-w-6 h-6 w-6" color={'lime'}/>
-                            <div className="text-black text-md">Take a photo in a well lit room</div>
+                            <div className="">Take a photo in a well lit room</div>
                         </div>
-                        <div className="flex  gap-4">
+                        <div className="flex gap-4">
                             <IoCloseCircleOutline className="min-h-6 min-w-6 h-6 w-6" color={'red'}/>
-                            <div className="text-black text-md">{`Don't edit images of your document`}</div>
+                            <div className="">{`Don't edit images of your document`}</div>
                         </div>
-                        <div className="flex  gap-4">
+                        <div className="flex gap-4">
                             <AiOutlineExclamationCircle className="min-h-6 min-w-6 h-6 w-6" color={'orange'}/>
-                            <div className="text-black text-md">{`If uploading a document with two sides, upload the front side first.`}</div>
+                            <div className="">{`If uploading a document with two sides, upload the front side first.`}</div>
                         </div>
                         
                     </div>
@@ -822,19 +822,19 @@ const Kyc = () => {
                         <div className="text-black text-sm text-center font-bold">Take a photo</div>
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                        <div className="text-black text-md font-bold">Tips</div>
-                        <div className="flex  gap-4">
+                    <div className="flex flex-col gap-2 text-sm md:text-md text-black">
+                        <div className="font-bold">Tips</div>
+                        <div className="flex gap-4">
                             <IoCheckmarkCircleOutline className="min-h-6 min-w-6 h-6 w-6" color={'lime'}/>
-                            <div className="text-black text-md">Find a well lit place</div>
+                            <div className="">Find a well lit place</div>
                         </div>
-                        <div className="flex  gap-4">
+                        <div className="flex gap-4">
                             <IoCheckmarkCircleOutline className="min-h-6 min-w-6 h-6 w-6" color={'lime'}/>
-                            <div className="text-black text-md">Ensure your face is within the frame</div>
+                            <div className="">Ensure your face is within the frame</div>
                         </div>
-                        <div className="flex  gap-4">
+                        <div className="flex gap-4">
                             <IoCloseCircleOutline className="min-h-6 min-w-6 h-6 w-6" color={'red'}/>
-                            <div className="text-black text-md">{`Don't wear hats, glasses, and masks`}</div>
+                            <div className="">{`Don't wear hats, glasses, and masks`}</div>
                         </div>
                     </div>
                 </div> 
@@ -906,7 +906,7 @@ const Kyc = () => {
                 <ProgressBar currentStep={currentStep} />
             </div>
 
-            <div className="flex flex-col relative items-center border-2 border-gray p-8 rounded-[20px] gap-10">
+            <div className="flex flex-col relative items-center border-2 border-gray p-8 rounded-[20px] gap-6">
                 {stepNames.indexOf(currentStep) > 0 && stepNames.indexOf(currentStep) < 4 && (
                     <FaChevronLeft
                         onClick={handlePrev}
