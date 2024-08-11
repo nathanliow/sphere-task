@@ -96,54 +96,81 @@ const Kyc = () => {
                     let frontResponse;
                     let backResponse;
 
-                    if (frontImageSrc) {
-                        frontResponse = await fetch('/api/addDocument', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ 
-                                userId: user.email, 
-                                documentImage: frontImageSrc, 
-                                documentType: addDocType,
-                                documentSide: 'FRONT_SIDE',
-                                country: country,
-                            }),
-                        });
-                        
-                        if (!frontResponse.ok) {
-                            setErrorMsg('Failed to upload document, please try again.');
+                    // 2 sided document
+                    if (frontImageSrc && backImageSrc) {
+                        if (frontImageSrc) {
+                            frontResponse = await fetch('/api/addDocument', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ 
+                                    userId: user.email, 
+                                    documentImage: frontImageSrc, 
+                                    documentType: addDocType,
+                                    documentSide: 'FRONT_SIDE',
+                                    country: country,
+                                }),
+                            });
+                            
+                            if (!frontResponse.ok) {
+                                setErrorMsg('Failed to upload document, please try again.');
+                                setLoading(false);
+                            }
                         }
-                    }
-    
-                    if (backImageSrc) {
-                        backResponse = await fetch('/api/addDocument', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ 
-                                userId: user.email, 
-                                documentImage: backImageSrc, 
-                                documentType: addDocType,
-                                documentSide: 'BACK_SIDE',
-                                country: country,
-                            }),
-                        });
-            
-                        if (!backResponse.ok) {
-                            setErrorMsg('Failed to upload document, please try again.');
+        
+                        if (backImageSrc) {
+                            backResponse = await fetch('/api/addDocument', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ 
+                                    userId: user.email, 
+                                    documentImage: backImageSrc, 
+                                    documentType: addDocType,
+                                    documentSide: 'BACK_SIDE',
+                                    country: country,
+                                }),
+                            });
+                
+                            if (!backResponse.ok) {
+                                setErrorMsg('Failed to upload document, please try again.');
+                                setLoading(false);
+                            }
+                        }
+
+                        if (frontResponse && backResponse && frontResponse.ok && backResponse.ok) {
+                            setProvideIdDocument(true);
                             setLoading(false);
                         }
-                    }
+                    } else if (frontImageSrc && !backImageSrc) {
+                        if (frontImageSrc) {
+                            frontResponse = await fetch('/api/addDocument', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ 
+                                    userId: user.email, 
+                                    documentImage: frontImageSrc, 
+                                    documentType: addDocType,
+                                    documentSide: null,
+                                    country: country,
+                                }),
+                            });
+                            
+                            if (!frontResponse.ok) {
+                                setErrorMsg('Failed to upload document, please try again.');
+                                setLoading(false);
+                            }
+                        }
 
-                    if (frontResponse && backResponse && frontResponse.ok && backResponse.ok) {
-                        setProvideIdDocument(true);
-                        setLoading(false);
-                    } else if (frontResponse && frontResponse.ok) {
-                        setProvideIdDocument(true);
-                        setLoading(false);
-                    } 
+                        if (frontResponse && frontResponse.ok) {
+                            setProvideIdDocument(true);
+                            setLoading(false);
+                        } 
+                    }
                 } catch (error) {
                     setErrorMsg(`${error}`);
                     console.error(error);
