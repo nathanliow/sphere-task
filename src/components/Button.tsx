@@ -1,13 +1,15 @@
 import React from 'react';
+import Loading from '@/components/Loading';
 
 type ButtonProps = {
   variant: 'primary' | 'secondary' | 'tertiary' | 'google' | 'inv-secondary';
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   children: React.ReactNode;
   disabled?: boolean;
+  loading?: boolean;
 };
 
-const Button: React.FC<ButtonProps> = ({ variant, onClick, children, disabled = false }) => {
+const Button: React.FC<ButtonProps> = ({ variant, onClick, children, disabled = false, loading = false }) => {
   let className = '';
 
   switch (variant) {
@@ -23,7 +25,7 @@ const Button: React.FC<ButtonProps> = ({ variant, onClick, children, disabled = 
       className = 'bg-white text-black py-2 px-4 border-2 border-gray rounded-[20px]';
       break;
     case 'google':
-      className = 'bg-white flex izontal justify-between w-full text-dark-gray text-sm text-bold py-2 px-4 border border-gray rounded-[10px] hover:bg-hover-white transition-colors duration-200';
+      className = 'bg-white flex justify-between w-full text-dark-gray text-sm text-bold py-2 px-4 border border-gray rounded-[10px] hover:bg-hover-white transition-colors duration-200';
       break;
     case 'inv-secondary':
       className = 'w-full bg-white text-blue border-2 border-blue py-2 px-4 rounded-[10px] hover:bg-hover-white transition-colors duration-200';
@@ -34,7 +36,17 @@ const Button: React.FC<ButtonProps> = ({ variant, onClick, children, disabled = 
 
   return (
     <button className={className} onClick={onClick} disabled={disabled}>
-      {children}
+      {loading ? (
+        <div className="flex items-center justify-center max-h-[24px]">
+          {disabled ? (
+            <Loading size={80}/>
+          ) : (
+            <Loading size={80} color="#FFFFFF"/>
+          )}
+        </div>
+      ) : (
+        children
+      )}
     </button>
   );
 };

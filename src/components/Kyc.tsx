@@ -38,6 +38,7 @@ const Kyc = () => {
     const [provideSelfie, setProvideSelfie] = useState(false);
     const [kycStatus, setKycStatus] = useState('');
     const [moderationComment, setModerationComment] = useState('');
+    const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     const handleNext = () => {
@@ -88,6 +89,7 @@ const Kyc = () => {
                 }
 
                 setWebcamActive(false);
+                setLoading(true);
 
                 // add id documents
                 try {
@@ -131,13 +133,16 @@ const Kyc = () => {
             
                         if (!backResponse.ok) {
                             setErrorMsg('Failed to upload document, please try again.');
+                            setLoading(false);
                         }
                     }
 
                     if (frontResponse && backResponse && frontResponse.ok && backResponse.ok) {
                         setProvideIdDocument(true);
+                        setLoading(false);
                     } else if (frontResponse && frontResponse.ok) {
                         setProvideIdDocument(true);
+                        setLoading(false);
                     } 
                 } catch (error) {
                     setErrorMsg(`${error}`);
@@ -150,6 +155,7 @@ const Kyc = () => {
                 }
 
                 setWebcamActive(false);
+                setLoading(true);
 
                 // add selfie document
                 try {
@@ -170,9 +176,11 @@ const Kyc = () => {
             
                         if (!response.ok) {
                             setErrorMsg('Failed to upload selfie, please try again.');
+                            setLoading(false);
                         }
 
                         setProvideSelfie(true);
+                        setLoading(false);
                     }
                 } catch (error) {
                     setErrorMsg(`${error}`);
@@ -211,6 +219,7 @@ const Kyc = () => {
     
         try {
             setWebcamActive(false);
+            setLoading(true);
 
             if (files.length === 1) {
                 let response;
@@ -227,19 +236,20 @@ const Kyc = () => {
                             userId: user.email, 
                             documentImage: imageSrc,
                             documentType: documentType,
-                            documentSide: 'null',
+                            documentSide: null,
                             country: country,
                         }),
                     });
     
                     if (!response.ok) {
                         setErrorMsg('Failed to upload file, please try again');
-                        console.log(response)
+                        setLoading(false);
                     }
                 }
 
                 if (response && response.ok) {
                     setProvideIdDocument(true);
+                    setLoading(false);
                 }
             } else {
                 let frontResponse;
@@ -265,6 +275,7 @@ const Kyc = () => {
 
                     if (!frontResponse.ok) {
                         setErrorMsg('Failed to upload front side file, please try again');
+                        setLoading(false);
                     }
                 }
 
@@ -285,11 +296,13 @@ const Kyc = () => {
 
                     if (!backResponse.ok) {
                         setErrorMsg('Failed to upload back side file, please try again.');
+                        setLoading(false);
                     }
                 }
 
                 if (frontResponse && backResponse && frontResponse.ok && backResponse.ok) {
                     setProvideIdDocument(true);
+                    setLoading(false);
                 }
             }
         } catch (error) {
@@ -882,7 +895,8 @@ const Kyc = () => {
                             (currentStep === 'SELECT_DOCUMENT' && (!country || !documentType)) ||
                             (currentStep === 'UPLOAD_DOCUMENT' && !provideIdDocument) ||
                             (currentStep === 'UPLOAD_SELFIE' && !provideSelfie)
-                        }    
+                        } 
+                        loading={loading}
                     >
                         Continue
                     </Button>
