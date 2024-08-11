@@ -67,7 +67,7 @@ const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, documentT
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-6 rounded-lg flex flex-col w-3/4 items-center gap-6">
                 {(documentType != "SELFIE") &&
-                    <div className="text-black text-2xl font">
+                    <div className="text-black text-xl md:text-2xl font">
                         {state.step === 'front' ? 'Front Side' : 'Back Side'}
                     </div>
                 }
@@ -99,7 +99,7 @@ const LiveCaptureModal: React.FC<LiveCaptureModalProps> = ({ isActive, documentT
                         videoConstraints={{ width: 1280, height: 720, facingMode: "user" }}
                     />
                 )}
-                <div className="flex justify-center gap-12">
+                <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-12">
                     {state.frontImageSrc && documentType === 'SELFIE' ? (
                         <>
                             <Button variant="tertiary" onClick={handleRetake}>

@@ -45,7 +45,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ currentStep }) => {
     }
 
     return (
-        <div className="flex flex-hor gap-4">
+        <div className="flex gap-4">
             {progressData.map((step, index) => (
                 <div key={index} className="flex flex-col w-full items-center">
                     <div className={`mb-2 font-semibold ${step.isHalfFilled ? 'text-black' : 'text-gray'}`}>

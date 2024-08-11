@@ -397,7 +397,7 @@ const Kyc = () => {
                     </div>
 
                     <div className="flex flex-col gap-6">
-                        <div className="flex flex-hor gap-4">
+                        <div className="flex gap-4">
                             <div className="flex items-center justify-center bg-light-gray rounded-full p-2">
                                 <HiOutlineIdentification size={40}/>
                             </div>
@@ -406,7 +406,7 @@ const Kyc = () => {
                                 <div className="text-black text-md">Provide identity document</div>
                             </div>
                         </div>
-                        <div className="flex flex-hor gap-4">
+                        <div className="flex  gap-4">
                             <div className="flex items-center justify-center bg-light-gray rounded-full p-2">
                                 <CiCamera size={40} />
                             </div>
@@ -727,15 +727,15 @@ const Kyc = () => {
             title: 'Provide your identity document',
             content: (
                 <div className="flex flex-col justify-center items-center gap-6">
-                    <div className="flex flex-hor gap-6">
-                        <div className="flex flex-col items-center border-2 border-gray p-12 rounded-[20px] cursor-pointer hover:bg-hover-white" onClick={handleOpenModal}>
+                    <div className="flex  gap-6">
+                        <div className="flex flex-col items-center border-2 border-gray p-4 md:p-12 rounded-[20px] cursor-pointer hover:bg-hover-white" onClick={handleOpenModal}>
                             <CiCamera size={40} />
-                            <div className="text-black text-sm font-bold">Take a photo</div>
+                            <div className="text-black text-sm font-bold text-center">Take a photo</div>
                         </div>
                         <label htmlFor="file-upload" className="flex flex-col items-center cursor-pointer">
-                            <div className="flex flex-col items-center border-2 border-gray p-12 rounded-[20px] hover:bg-hover-white">
+                            <div className="flex flex-col items-center border-2 border-gray p-4 md:p-12 rounded-[20px] hover:bg-hover-white">
                                     <MdOutlineFileUpload size={40} />
-                                    <div className="text-black text-sm font-bold">Upload a file</div>
+                                    <div className="text-black text-sm font-bold text-center">Upload a file</div>
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -750,20 +750,20 @@ const Kyc = () => {
 
                     <div className="flex flex-col gap-2">
                         <div className="text-black text-md font-bold">Tips</div>
-                        <div className="flex flex-hor gap-4">
-                            <IoCheckmarkCircleOutline size={24} color={'lime'}/>
+                        <div className="flex  gap-4">
+                            <IoCheckmarkCircleOutline className="min-h-6 min-w-6 h-6 w-6" color={'lime'}/>
                             <div className="text-black text-md">Upload a colored photo or file</div>
                         </div>
-                        <div className="flex flex-hor gap-4">
-                            <IoCheckmarkCircleOutline size={24} color={'lime'}/>
+                        <div className="flex  gap-4">
+                            <IoCheckmarkCircleOutline className="min-h-6 min-w-6 h-6 w-6" color={'lime'}/>
                             <div className="text-black text-md">Take a photo in a well lit room</div>
                         </div>
-                        <div className="flex flex-hor gap-4">
-                            <IoCloseCircleOutline size={24} color={'red'}/>
+                        <div className="flex  gap-4">
+                            <IoCloseCircleOutline className="min-h-6 min-w-6 h-6 w-6" color={'red'}/>
                             <div className="text-black text-md">{`Don't edit images of your document`}</div>
                         </div>
-                        <div className="flex flex-hor gap-4">
-                            <AiOutlineExclamationCircle size={24} color={'orange'}/>
+                        <div className="flex  gap-4">
+                            <AiOutlineExclamationCircle className="min-h-6 min-w-6 h-6 w-6" color={'orange'}/>
                             <div className="text-black text-md">{`If uploading a document with two sides, upload the front side first.`}</div>
                         </div>
                         
@@ -775,23 +775,23 @@ const Kyc = () => {
             title: 'Upload a selfie',
             content: (
                 <div className="flex flex-col justify-center items-center gap-6">
-                    <div className="flex flex-col items-center border-2 border-gray p-12 rounded-[20px] cursor-pointer hover:bg-hover-white" onClick={handleOpenModal}>
+                    <div className="flex flex-col items-center border-2 border-gray p-4 md:p-12 rounded-[20px] cursor-pointer hover:bg-hover-white" onClick={handleOpenModal}>
                         <CiCamera size={40} />
-                        <div className="text-black text-sm font-bold">Take a photo</div>
+                        <div className="text-black text-sm text-center font-bold">Take a photo</div>
                     </div>
 
                     <div className="flex flex-col gap-2">
                         <div className="text-black text-md font-bold">Tips</div>
-                        <div className="flex flex-hor gap-4">
-                            <IoCheckmarkCircleOutline size={24} color={'lime'}/>
+                        <div className="flex  gap-4">
+                            <IoCheckmarkCircleOutline className="min-h-6 min-w-6 h-6 w-6" color={'lime'}/>
                             <div className="text-black text-md">Find a well lit place</div>
                         </div>
-                        <div className="flex flex-hor gap-4">
-                            <IoCheckmarkCircleOutline size={24} color={'lime'}/>
+                        <div className="flex  gap-4">
+                            <IoCheckmarkCircleOutline className="min-h-6 min-w-6 h-6 w-6" color={'lime'}/>
                             <div className="text-black text-md">Ensure your face is within the frame</div>
                         </div>
-                        <div className="flex flex-hor gap-4">
-                            <IoCloseCircleOutline size={24} color={'red'}/>
+                        <div className="flex  gap-4">
+                            <IoCloseCircleOutline className="min-h-6 min-w-6 h-6 w-6" color={'red'}/>
                             <div className="text-black text-md">{`Don't wear hats, glasses, and masks`}</div>
                         </div>
                     </div>
@@ -810,11 +810,11 @@ const Kyc = () => {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <div className="flex flex-hor gap-4">
+                        <div className="flex  gap-4">
                             <IoCheckmarkCircleOutline size={24} color={'lime'}/>
                             <div className="text-black text-md">Identification</div>
                         </div>
-                        <div className="flex flex-hor gap-4">
+                        <div className="flex  gap-4">
                             <IoCheckmarkCircleOutline size={24} color={'lime'}/>
                             <div className="text-black text-md">Selfie</div>
                         </div>
@@ -871,7 +871,7 @@ const Kyc = () => {
                         className="absolute top-8 left-8 text-xl cursor-pointer"
                     />
                 )}
-                <div className="text-black text-xl font-bold px-8">{steps[stepNames.indexOf(currentStep)].title}</div>
+                <div className="text-black text-xl text-center font-bold px-8">{steps[stepNames.indexOf(currentStep)].title}</div>
                 <div>{steps[stepNames.indexOf(currentStep)].content}</div>
 
                 {(stepNames.indexOf(currentStep) < 4) && (<div className="flex flex-col justify-center w-1/2">

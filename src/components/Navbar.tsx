@@ -47,13 +47,13 @@ const Navbar: React.FC = () => {
           <Link href="/" className="text-black hover:text-blue text-sm font-medium">
             Home
           </Link>
-          <Link href="/customers" className="text-black hover:text-blue text-sm font-medium">
+          <Link href="/" className="text-black hover:text-blue text-sm font-medium">
             Customers
           </Link>
-          <Link href="/company" className="text-black hover:text-blue text-sm font-medium">
+          <Link href="/" className="text-black hover:text-blue text-sm font-medium">
             Company
           </Link>
-          <Link href="/developers" className="text-black hover:text-blue text-sm font-medium">
+          <Link href="/" className="text-black hover:text-blue text-sm font-medium">
             Developers
           </Link>
         </div>

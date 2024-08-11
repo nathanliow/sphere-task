@@ -23,7 +23,7 @@ const Button: React.FC<ButtonProps> = ({ variant, onClick, children, disabled = 
       className = 'bg-white text-black py-2 px-4 border-2 border-gray rounded-[20px]';
       break;
     case 'google':
-      className = 'bg-white flex flex-horizontal justify-between w-full text-dark-gray text-sm text-bold py-2 px-4 border border-gray rounded-[10px] hover:bg-hover-white transition-colors duration-200';
+      className = 'bg-white flex izontal justify-between w-full text-dark-gray text-sm text-bold py-2 px-4 border border-gray rounded-[10px] hover:bg-hover-white transition-colors duration-200';
       break;
     case 'inv-secondary':
       className = 'w-full bg-white text-blue border-2 border-blue py-2 px-4 rounded-[10px] hover:bg-hover-white transition-colors duration-200';
